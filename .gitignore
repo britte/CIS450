@@ -1,2 +1,4 @@
 .elasticbeanstalk/
 .idea/
+AWS-*
+pennbook/
