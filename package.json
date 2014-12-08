@@ -1,8 +1,4 @@
 {
-   "name": "Trip Planner",
    "description": "Final project for CIS 450",
-   "version": "0.0.1",
-   "scripts": {
-     "start": "node app.js"
-   }
+   "version": "0.0.1"
 }
