@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+
+function dateFill()
+{
+	var day = document.getElementById("day");
+	for (var i=1; i<= 31; i++){
+		var option = document.createElement("option");
+		option.text = i;
+		option.value = i;
+		try {
+			day.add(option,day.options[null]);
+		} catch (e) {
+			day.add(option, null);
+		}
+	}
+	
+	var year = document.getElementById("year");
+	for (var i=1923; i<=2013; i++){
+		var option = document.createElement("option");
+		option.text = i; 
+		option.value = i;
+		try {
+			year.add(option,year.options[null]);
+		} catch (e) {
+			year.add(option, null);
+		}
+	}
+}
+
+window.onload = dateFill;
+</script>
+</head>
+<body>
+  <h1 id="title">Sign Up!</h1>
+  <p style="color:red">
+  <% if (error != null) {%>
+  	<%= error %>
+  <%}%>
+  &nbsp;
+  </p>
+  <form action="/createaccount" method="post">
+    <input type="text" name="usr" placeholder="Username"></br>
+    <input type="password" name="pwd" placeholder="Password"></br>
+    <input type="text" name="email" placeholder="Email Address"></br>
+    <input type="text" name="first" placeholder="First Name">
+    <input type="text" name="last" placeholder="Last Name"></br>
+    <select id="month" name="month">
+    	<option selected="true" disabled="true">Month</option>
+    	<option disabled="true"> ------- </option>
+    	<option value="1">January</option>
+    	<option value="2">February</option>
+    	<option value="3">March</option>
+    	<option value="4">April</option>
+    	<option value="5">May</option>
+    	<option value="6">June</option>
+    	<option value="7">July</option>
+    	<option value="8">August</option>
+    	<option value="9">September</option>
+    	<option value="10">October</option>
+    	<option value="11">November</option>
+    	<option value="12">December</option>
+    </select>
+    <select id="day" name="day">
+    	<option selected="true" disabled="true">Day</option>
+    	<option disabled="true"> ----- </option>
+    </select>
+    <select id="year" name="year">
+    	<option selected="true" disabled="true">Year</option>
+    	<option disabled="true"> ------ </option>
+    </select>
+    </br>
+    <input type="submit" value="Submit">
+  </form>
+  </br>
+  <a href="/">Sign In</a>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.css"> 
+   <center> <large> <h1><font color="##98CAFF">News Feed</font> </h1> </large> </center>
+
+  <style type="text/css"> 
+ body { 
+ padding-top: 60px; 
+ padding-bottom: 60px; 
+ background-color: white; 
+ } 
+ .login-box { 
+ max-width: 500px; 
+ margin: 0 auto; 
+ } 
+ .login-box .form-control { 
+ margin-bottom: 20px; 
+ } 
+ .status {
+ 	margin: 0 auto;
+ 	padding: 10px;
+ 	border: solid 1px black;
+ 	width: 300px;
+ }
+ </style>
+ <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+ <script type="text/javascript">
+	function lookup() {
+ 		var input = document.getElementById('search').value;
+ 		if (input.length == 0){
+ 		 	$("suggestions").html("");
+ 		} else {
+	 		$.getJSON('/search/'+escape(input), function (elements) {
+	 		 	var output = "<table border=\"1\">\n";
+	 			for (var i=0; i<elements.length; i++) {
+	 				output += "<tr><td>"+
+	 				'<a href="../wall/'+elements[i].username+'">'+elements[i].name+"</a></td></tr>\n";
+	 			}
+	 			output += "</table>\n";
+	 			$("#suggestions").html(output);
+	 		});
+ 		}
+ 	}
+
+ 	function getPosts() {
+		$.getJSON('../homepage', function(posts) {
+			console.log(posts);
+		 	htmlOut = "";
+			for (var i=0; i<posts.length; i++){
+				htmlOut += ('<div class="post">\n' +
+								'<strong>' + posts[i].poster + ' to ' + posts[i].username + '</strong>\n' +
+								posts[i].text + "\n");
+				//for (j = 0; j < posts[i].comments.length; j++) {
+				//	htmlOut += ('<div class="comment">\n' +
+				//					posts[i].comments[j] + '\n' +
+				//				'</div>');
+				//}
+				//htmlOut += ('<form action="../postcomment/wall/'+posts[i].id+'" method="post">\n'+
+				//'<input type="text" name="comment" placeHolder="Comment">\n'+
+				//'<input type="submit" value="Submit">\n'+
+				//'</form>\n'+
+				htmlOut += '</div>\n';
+				}
+				console.log(htmlOut);
+				$("#posts").html(htmlOut);
+			});
+	}
+	window.onload = function () {
+		getPosts();
+	}
+ </script>
+ </head>
+<body>
+<ul class="nav nav-pills">
+	<li class="active"><a href="#">Home</a></li>
+	<li><a href="../wall/<%=user%>">My Wall</a>
+  	</li>
+	<li><a href="../logout">Logout</a></li>
+	<input type="hidden" name="user" value="<%=user%>">
+	<form class="navbar-form navbar-right" role="search">
+		<div class="form-group">
+			<input type="text" id="search" onkeyup="lookup()" class="form-control" placeholder="Search">
+		</div>
+		<button type="submit" class="btn btn-default">
+		<span class="glyphicon glyphicon-search"></span>
+		</button>
+	</form>
+</ul>
+<br><br>
+<div id="suggestions">
+</div>
+<div class = "login-box"> 
+  	<center> 
+  	<form action ="/poststatus" method="post">
+  		<input type="text" name="post" placeHolder="What's on your mind? Enter status here!" class="form-control"><br>
+  	  	<input type="submit" value="Submit" class = btn btn-lg btn-primary btn-block>
+  	  	<div id="posts"></div>
+  	  	<%if (error != null) { %>
+ 		<font color="red"><p><%= error %></p>
+  		<% } %>
+  	</form>
+</div>
+<div>
+	<% if (results) { %>
+		<% for (i = 0; i < 10 && i < results.length;i++) { %>
+			<div class="status">
+				<strong><%= results[i].name%></strong>
+				<%= results[i].status%>
+				<% for (j = 0; j < results[i].comments.length; j++) {%>
+					<div class="comment">
+						<%= results[i].comments[j]%>
+					</div>
+				<% } %>
+			<form action="/postcomment" method="post">
+			<input type="text" name="comment" placeHolder="Comment">
+			<input type="submit" value="Submit">
+			</form>
+			</div>
+		<% } %>
+	<% } %>
+</div>
+</center>
+</body>
+</html>

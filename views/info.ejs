@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+	$(".netTog").click(function() {
+		$(".network").toggle();
+	});
+});
+function getInterests() {
+	$.getJSON('../interests/<%=profile.user%>', function(interests) {
+	 	htmlOut = "Interests: ";
+		for (var i=0; i<interests.length; i++){
+			htmlOut += interests[i];
+			if (i < interests.length - 1) htmlOut += ", ";
+			console.log(htmlOut);
+		}
+		$("#interests").html(htmlOut);
+	});
+  }
+window.onload = function () {
+	getInterests();
+}
+</script>
+</head>
+<body>
+   <center> <large> <h1><font color="##98CAFF">Update or Add To Your Profile!</font> </h1> </large> </center>
+
+  <p style="color:red">
+  <% if (error != null) {%>
+  	<%= error %>
+  <%}%>
+  &nbsp;
+  </p>
+<div>
+	<% if (profile) { %>
+		<center> <p><b> Birthday </b> : <%=profile.birthday%> </p> <center?
+		<p><b>Email</b>: <%=profile.email%> </p>
+		<center> <% if (profile.network) { %>
+			<p class="network">Network: <%=profile.network%> 
+			<button class="netTog">Edit</button> </p>
+			<form class="network" style="display:none" action="../network" method="post">
+	    		 <input type="text" name="<network" placeholder="<%=profile.network%>"> 
+	    		<input type="submit" value="Submit">
+	 		</form>
+ 		<% } else { %>
+ 			<form class="network" action="../network" method="post">
+	    		<input type="text" name="network" placeholder="Add Network">
+	    		<input type="submit" value="Submit">
+	 		</form>
+ 		<% } %>
+		<p id="interests"></p>
+		<form action="/addinterest" method="post">
+	    	<input type="text" name="interest" placeholder="Add Interest">
+	    	<input type="submit" value="Submit">
+	 	</form>	
+	<% } %> </center>
+</div>
+</body>
+</html>

@@ -1,7 +1,10 @@
-var http = require("http");
-http.createServer(function(request, response) {  
-  response.writeHead(200, {"Content-Type": "text/plain"});  
-  response.write("Hello from the Node.js server!");  
-  response.end();
-}).listen(8081);
-console.log('Server is listening to http://localhost/ on port 8080…');
+var express = require('express');
+var routes = require('./routes/routes.js');
+var app = express();
+app.use(express.static(__dirname + '/public'));
+app.set('view engine', 'jade');
+
+app.get('/', routes.api.users);
+
+// listen on port 8081
+app.listen(8081);
