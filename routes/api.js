@@ -55,7 +55,7 @@ var post_trip = function(req, res){
 }
 
 var add_friend = function(req, res){
-    db.addFriend(req.user1, req.user2, function(data, err){
+    db.addFriend(req.params.user1, req.params.user2, function(data, err){
         if(err){
             console.log("Error adding friend");
         } else{
@@ -65,7 +65,7 @@ var add_friend = function(req, res){
 }
 
 var respond_to_friend_request = function(req, res){
-    db.updateFriend(req.user1, req.user2, req.decision, function(data, err){
+    db.updateFriend(req.params.user1, req.params.user2, req.params.decision, function(data, err){
         if(err){
             console.log("error updating friend request");
         } else {
@@ -78,6 +78,26 @@ var get_news_feed = function(req, res){
     db.getNewsFeed(req.body, function(data, err){
         if(err){
             console.log("error getting news feed");
+        } else {
+            res.json({data: data, err: !!err, errMsg: err});
+        }
+    });
+}
+
+var invite_to_trip = function(req, res){
+    db.inviteTrip(req.params.user1, req.params.user2, req.params.trip function(data, err){
+        if(err){
+            console.log("error inviting to trip");
+        } else {
+            res.json({data: data, err: !!err, errMsg: err});
+        }
+    });
+}
+
+var respond_to_trip_invite = function(req, res){
+    db.updateTripInvite(req.body.user1, req.body.user2, req.body.trip, req.body.decision, function(data, err){
+        if(err){
+            console.log("error updating invite");
         } else {
             res.json({data: data, err: !!err, errMsg: err});
         }

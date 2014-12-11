@@ -163,13 +163,56 @@ var dbGetNewsFeed = function(user, callback){
             connection.execute(script,
                                [user1.id],
                                 function(err, results) {
-                                    if (err) { callback(null, "Error updating friend request: " + err); }
+                                    if (err) { callback(null, "Error getting news feed: " + err); }
                                     else { callback({user1: user1}, null); }
                                         connection.close();
                                         console.log("Connection closed.")
                                 });
         }
     }); 
+}
+
+var dbInviteTrip = function(user1, user2, trip, callback){
+    var script = "INSERT INTO PARTICIPATE_TRIP (status, inviter, invitee, trip) " +
+                 "VALUES (:1, :2, :3, :4);";
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script,
+                               [0, user1.id, user2.id, trip.id],
+                                function(err, results) {
+                                    if (err) { callback(null, "Error inviting to trip: " + err); }
+                                    else { callback({user1: user1, user2: user2, trip: trip}, null); }
+                                        connection.close();
+                                        console.log("Connection closed.")
+                                });
+        }
+    }); 
+}
+
+var dbRespondToTripInvite = function(user1, user2, trip, decision, callback){
+    var yes_script = "UPDATE PARTICIPATE_TRIP"  +
+                     "SET STATUS = 1 " + 
+                     "WHERE INVITER = :1 AND INVITEE = :2 AND TRIP = :3;";
+    var no_script = "DELETE FROM PARTICIPATE_TRIP " +
+                    "WHERE INVITER = 1 AND INVITEE = 2 AND TRIP = 2;";
+    var script = decision ? yes_script : no_script;
+
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script,
+                               [0, user1.id, user2.id, trip.id],
+                                function(err, results) {
+                                    if (err) { callback(null, "Error inviting to trip: " + err); }
+                                    else { callback({user1: user1, user2: user2, trip: trip}, null); }
+                                        connection.close();
+                                        console.log("Connection closed.")
+                                });
+        }
+    });     
 }
 
 var database = {
@@ -180,7 +223,9 @@ var database = {
   postTrip: dbPostTrip,
   addFriend: dbAddFriend,
   updateFriend: dbRespondToFriendRequest,
-  getNewsFeed: dbGetNewsFeed
+  getNewsFeed: dbGetNewsFeed,
+  inviteTrip: dbInviteTrip,
+  updateTripInvite: dbRespondToTripInvite
 };
 
 module.exports = database;
