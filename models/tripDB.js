@@ -7,14 +7,30 @@ var oracle = require('oracle'),
         password: "450password"
     };
 
-var dbGetUser = function(login, callback){
-    var script = "select * from users u where u.login = '" + login + "'";
+var dbGetUserExists = function(login, callback){
+    var script = "SELECT * FROM users WHERE login = '" + login + "'";
     oracle.connect(connectData, function(err, connection){
-        if (err) { console.log("Error connecting to db:", err); }
+        if (err) { console.log("Error connecting to db:" + err); }
         else {
             console.log("Connected...");
             connection.execute(script, [], function(err, results) {
-                if (err) { callback(null, "Error fetching users:", err); }
+                if (err) { callback(null, "Error fetching users:" + err); }
+                else { callback(results.length > 0, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
+var dbGetUser = function(login, pwd, callback){
+    var script = "SELECT * FROM users where login = '" + login + "' AND pwd = '" + pwd + "'";
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [], function(err, results) {
+                if (err) { callback(null, "Error fetching users:" + err); }
                 else { callback({users: results}, null); }
                 connection.close();
                 console.log("Connection closed.")
@@ -24,13 +40,17 @@ var dbGetUser = function(login, callback){
 }
 
 var dbPostUser = function(user, callback){
-    var script = "INSERT INTO users (id, name, pwd, login) VALUES (:1, :2, :3, :4) RETURNING id INTO :5";
+    var script = "INSERT INTO users (id, name, pwd, login, affiliation) " +
+                 "SELECT MAX(id) + 1, :1, :2, :3, :4  FROM users";
     oracle.connect(connectData, function(err, connection){
-        if (err) { console.log("Error connecting to db:", err); }
+        if (err) { console.log("Error connecting to db:" + err); }
         else {
             console.log("Connected...");
-            connection.execute(script, [151, 'LizBiz', 'password', 'lizbiz', new oracle.OutParam(oracle.OCCINUMBER)], function(err, results) {
-                if (err) { callback(null, "Error creating user:", err); }
+            connection.execute(script, [user.name.toString(),
+                                        user.pwd.toString(),
+                                        user.login.toString(),
+                                        user.affiliation ? user.affiliation.toString() : null], function(err, results) {
+                if (err) { callback(null, "Error creating user: " + err); }
                 else { callback({uid: results.returnParam}, null); }
                 connection.close();
                 console.log("Connection closed.")
@@ -41,6 +61,7 @@ var dbPostUser = function(user, callback){
 
 var database = {
   getUser: dbGetUser,
+  getUserExists: dbGetUserExists,
   postUser: dbPostUser
 };
 

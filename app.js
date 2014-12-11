@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.get('/', routes.main);
 
 // API routes
-app.get('/api/user/:login', api.get_user);
+app.get('/api/user/:login/:pwd', api.get_user);
 app.post('/api/user', api.post_user);
 
 // listen on port 8081

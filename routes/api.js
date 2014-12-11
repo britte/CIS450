@@ -1,8 +1,9 @@
 var db = require('../models/tripDB.js');
 
 var get_user = function(req, res) {
-    var login = req.params.login;
-    db.getUser(login, function(data, err) {
+    var login = req.params.login,
+        pwd = req.params.pwd;
+    db.getUser(login, pwd, function(data, err) {
         res.json({data: data.users, err: !!err, errMsg: err})
     })
 }
@@ -16,8 +17,8 @@ var get_user = function(req, res) {
 // Create a new user account
 var post_user = function(req, res) {
     // Check that username doesn't exist
-    db.getUser(req.body.login, function(data, err) {
-        if (data.users && data.users.length == 0) {
+    db.getUserExists(req.body.login, function(data, err) {
+        if (!data) {
             // Validation data
             if (!req.body.name || !req.body.login || !req.body.pwd) {
                 res.json({data: null, err: true, errMsg: 'Invalid data'})
