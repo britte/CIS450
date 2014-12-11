@@ -31,7 +31,57 @@ var post_user = function(req, res) {
         } else {
             res.json({data: null, err: !!err, errMsg: 'User already exists'})
         }
-    })
+    });
+}
+
+var update_user = function(req, res) {
+    db.updateUser(req.body.user, req.body.opts, function(data, err){
+        if (err){
+            console.log("error updating user");
+        } else {
+            console.log("this updaet worked yo!");
+        }
+    });
+}
+
+var post_trip = function(req, res){
+    db.post_trip(req.body, function(data, err){
+        if(err){
+            console.log("error creating a trip");
+        } else {
+            res.json({data: data, err: !!err, errMsg: err});    
+        }
+    });
+}
+
+var add_friend = function(req, res){
+    db.addFriend(req.user1, req.user2, function(data, err){
+        if(err){
+            console.log("Error adding friend");
+        } else{
+            res.json({data: data, err: !!err, errMsg: err});
+        }
+    });
+}
+
+var respond_to_friend_request = function(req, res){
+    db.updateFriend(req.user1, req.user2, req.decision, function(data, err){
+        if(err){
+            console.log("error updating friend request");
+        } else {
+            res.json({data: data, err: !!err, errMsg: err});
+        }
+    });
+}
+
+var get_news_feed = function(req, res){
+    db.getNewsFeed(req.body, function(data, err){
+        if(err){
+            console.log("error getting news feed");
+        } else {
+            res.json({data: data, err: !!err, errMsg: err});
+        }
+    });
 }
 
 //var get_users = function(req, res) {
