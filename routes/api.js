@@ -104,6 +104,69 @@ var respond_to_trip_invite = function(req, res){
     });
 }
 
+var add_media = function(req, res){
+
+    db.addMedia(req.body.media, function(data, err){
+        if(err) {
+            console.log("error adding media");
+        } else {
+            res.json({data: data, err: !!err, errMsg: err});
+        }
+    });
+}
+
+var add_comment = function(req, res){
+    db.addComment(req.body.comment, req.body.is_media, function(data, err){
+        if(err){
+            var type = req.body.is_media ? "media" : "trip";
+            console.log("error adding comment to " + type);
+        } else {
+            res.json({data: data, err: !!err, errMsg: err});
+        }
+    });
+}
+
+var add_rating = function(req, res){
+    db.addRating(req.body.rating, req.body.is_media, function(data, err){
+        if(err) {
+            var type = req.body.is_media ? "media" : "trip";
+            console.log("error adding rating to " + type);
+        } else {
+            res.json({data: data, err: !!err, errMsg: err});
+        }
+    });
+}
+
+var recommend_friend = function(req, res){
+    db.recommendFriend(req.body.user, function(data, err){
+        if(err){
+            console.log("error getting friend recs");
+        } else {
+            res.json(data: data, err: !!err, errMsg: err);
+        }
+    });
+}
+
+var recommend_location = function(req, res){
+    db.recommendLocation(req.body.user, function(data, err){
+        if(err){
+            console.log("error getting location recs");
+        } else {
+            res.json(data: data, err: !!err, errMsg: err);
+        }
+    });
+}
+
+var search = function(req, res){
+    db.search(req.body.searchTerm, function(data, err){
+        if(err) {
+            console.log("error during user/location search");
+        } else {
+            res.json(data: data, err: !!err, errMsg: err);
+        }
+    });
+}
+
 //var get_users = function(req, res) {
 //    db.users(function(data, err) {
 //        if (err) {
