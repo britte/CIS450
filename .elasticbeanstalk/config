@@ -1,0 +1,14 @@
+[global]
+ApplicationName=trip_app
+AwsCredentialFile=/Users/britte/.elasticbeanstalk/aws_credential_file
+DevToolsEndpoint=git.elasticbeanstalk.us-west-2.amazonaws.com
+EnvironmentName=tripapp-env
+EnvironmentTier=WebServer::Standard::1.0
+EnvironmentType=SingleInstance
+InstanceProfileName=aws-elasticbeanstalk-ec2-role
+OptionSettingFile=/Users/britte/CIS450/app/.elasticbeanstalk/optionsettings.tripapp-env
+RdsEnabled=No
+Region=us-west-2
+ServiceEndpoint=https://elasticbeanstalk.us-west-2.amazonaws.com
+SolutionStack=32bit Amazon Linux 2014.03 v1.0.9 running Node.js
+
