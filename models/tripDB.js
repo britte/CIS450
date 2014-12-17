@@ -478,6 +478,26 @@ var dbGetUserAlbums = function(uid, callback){
      });
  }
 
+
+ var dbPostMedia = function(uid, aid, video, url, private, callback){
+     var script = "INSERT INTO media (id, owner, album, upload_date, is_video, media_url, privacy, num_hits) " +
+                  "SELECT MAX(id) + 1, :1, :2, :3, :4, :5, :6, :7 FROM media";
+     oracle.connect(connectData, function(err, connection){
+         if (err) { console.log("Error connecting to db:" + err); }
+         else {
+             console.log("Connected...");
+             var isVideo = video ? 1 : 0,
+                 isPrivate = private ? 1 : 0;
+             connection.execute(script, [uid, aid, null, isVideo, url, isPrivate, 0], function(err, results) {
+                 if (err) { callback( null, err); }
+                 else { callback(true, null); }
+                 connection.close();
+                 console.log("Connection closed.")
+             });
+         }
+     });
+ }
+
 //var dbGetNewsFeed = function(user, callback){
 //    var script = "SELECT M.Media_Url " +
 //                 "FROM Users U " +
@@ -747,6 +767,7 @@ var database = {
   getAlbum: dbGetAlbum,
   getUserAlbums: dbGetUserAlbums,
   getTripAlbums: dbGetTripAlbums,
+  postMedia: dbPostMedia,
 
   updateCache: dbUpdateCachedMedia
 };

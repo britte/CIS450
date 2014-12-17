@@ -56,6 +56,7 @@ app.post('/api/invite-trip/:trip/:friend', api.post_trip_invite);
 app.post('/api/respond-trip-invite/:trip/:decision?', api.post_update_trip_invite);
 
 app.post('/api/postalbum', api.post_album);
+app.post('/api/postmedia', api.post_media);
 
 // listen on port 8081
 app.listen(8081);
