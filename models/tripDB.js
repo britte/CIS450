@@ -383,6 +383,32 @@ var dbSearch = function(searchTerm, callback){
     });    
 }
 
+var dbUpdateCachedMedia = function(callback){
+    var script = "WITH sortedMedia AS( " +
+                 "SELECT * " +
+                 "FROM MEDIA M " +
+                 "ORDER BY NUM_HITS DESC " +
+                 ") SELECT * " +
+                 "FROM sortedMedia " +
+                 "WHERE ROWNUM <= 3;";
+
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script,
+                               [user.id],
+                                function(err, results) {
+                                    if (err) { callback(null, "Error getting media to cache: " + err); }
+                                    else { callback({media: results}, null); }
+                                    connection.close();
+                                    console.log("Connection closed.")
+                                });
+        }
+    });     
+}
+
+
 var database = {
   getUser: dbGetUser,
   getUserExists: dbGetUserExists,
@@ -399,7 +425,8 @@ var database = {
   addRating: dbAddRating,
   recommendFriends: dbRecommendFriend,
   recommendLocation: dbRecommendLocation,
-  search: dbSearch
+  search: dbSearch,
+  updateCache: dbUpdateCachedMedia
 };
 
 module.exports = database;

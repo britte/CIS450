@@ -167,6 +167,20 @@ var search = function(req, res){
     });
 }
 
+var update_cache = function(req, res){
+    db.updateCache(function(data, err){
+        if(err){
+            console.log("error updating cache");
+        } else {
+            var cacheMap = {};
+            cacheMap["first"] = [data[0].id, data[0].media_url];
+            cacheMap["second"] = [data[1].id, data[1].media_url];
+            cacheMap["third"] = [data[2].id, data[2].media_url];
+            res.json({data: cacheMap, err: !!err, errMsg: err});
+        }
+    });
+}
+
 //var get_users = function(req, res) {
 //    db.users(function(data, err) {
 //        if (err) {
