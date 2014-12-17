@@ -66,13 +66,15 @@ var get_trip_edit = function(req, res) {
 }
 
 var get_album = function(req, res) {
-    var aid = req.params.aid;
+    var aid = req.params.album;
     db.getAlbum(aid, function(data, err){
         if (err) {
             console.log("Error getting trip: " + err);
             res.json({data: data, err: !!err, errMsg: err});
         } else {
-            res.render('album.ejs', {media: data.media, album: data.album})
+            res.render('album.ejs', {album: data,
+                                     media: [],
+                                     user: req.session.user})
         }
     })
 }

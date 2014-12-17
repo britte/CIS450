@@ -270,6 +270,21 @@ var get_albums = function(req, res) {
     })
 }
 
+var post_media = function(req, res){
+    var uid = req.session.user.ID,
+        aid = req.body.album,
+        url = req.body.url,
+        video = !!req.body.video,
+        private = !!req.body.private;
+    db.postMedia(uid, aid, video, url, private, function(trip, err) {
+        if (err) {
+            console.log("Error adding media album: " + err)
+            res.json({data: trip, err: !!err, errMsg: err});
+        } else {
+            res.redirect("/album/" + aid);
+        }
+    })
+}
 
 
 //var add_media = function(req, res){
@@ -401,7 +416,8 @@ var api = {
     get_outstanding_invites: get_outstanding_invites,
 
     post_album: post_album,
-    get_albums: get_albums
+    get_albums: get_albums,
+    post_media: post_media,
 //    get_news_feed: get_news_feed
 };
 
