@@ -8,10 +8,20 @@
   <h1>Edit Profile</h1>
   <form action="/api/user-edit" method="post">
      Username: <input type="text" name="name" value="<%= user.NAME %>">
-     Affiliation: <input type="text" name="affiliation" value="<% user.AFFILIATION ? user.AFFILIATION : ''%>">
+     <br/>
+     <br/>
+     Affiliation: <input type="text" name="affiliation" value="<%= user.AFFILIATION ? user.AFFILIATION : ''%>">
+     <br/>
+     <br/>
      Old Password: <input type="password" name="old_pwd">
+     <br/>
+     <br/>
      New Password: <input type="password" name="new_pwd_1">
+     <br/>
+     <br/>
      Retype New Password: <input type="password" name="new_pwd_2">
+     <br/>
+     <br/>
      <input class="btn" type="submit" value="Update" >
   </form>
   <script src="/bootstrap/dist/js/bootstrap.min.js"></script>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+<div class="col-xs-6">
+    <img width="600" src="<%=media.MEDIA_URL%>">
+</div>
+<div class="col-xs-6">
+    <form action="/api/post-media-rating/<%=media.ID%>" method="post">
+        <input type="radio" name="rating" value="1"> 1
+        <input type="radio" name="rating" value="2"> 2
+        <input type="radio" name="rating" value="3"> 3
+        <input type="radio" name="rating" value="4"> 4
+        <input type="radio" name="rating" value="5"> 5
+        <input class="btn" type="submit" value="Rate">
+    </form>
+    <form action="/api/post-media-comment/<%=media.ID%>" method="post">
+        <input type="text" name="comment">
+        <input class="btn" type="submit" value="Comment">
+    </form>
+    <div>
+        <% for (i = 0; i < comments.length; i++) { %>
+        <% var c = comments[i] %>
+            <a href="/homepage/<%=c.U_LOGIN%>"><%=c.U_NAME%></a>
+            <%=c.MEDIA_COMMENT%>
+            <br/>
+        <% } %>
+    </div>
+</div>
+
+<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
