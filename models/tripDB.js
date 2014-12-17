@@ -639,6 +639,7 @@ var dbAddMediaRating = function(rating, uid, mid, callback){
 var dbAddMediaComment = function(comment, uid, mid, callback){
     var script = "INSERT INTO COMMENT_MEDIA (media_comment, commenter, media, timestamp) " +
                  "VALUES (:1, :2, :3, CURRENT_TIMESTAMP)";
+
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
