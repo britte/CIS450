@@ -233,6 +233,26 @@ var dbPostTrip = function(uid, name, callback){
     });
 }
 
+var dbUpdateTrip = function(tid, name, callback){
+    var script = "UPDATE trips " +
+                 "SET name=:1 " +
+                 "WHERE id=:2";
+    oracle.connect(connectData, function(err, connection){
+        if (err) {
+            console.log("Error connecting to db: " + err);
+        } else {
+            console.log("Connected...");
+                connection.execute(script, [name, tid],
+                    function(err, results){
+                        if (err) { callback(null, err); }
+                        else { callback(true, null);}
+                        connection.close();
+                        console.log("connection closed.");
+                });
+        }
+    });
+}
+
 var dbGetTrip = function(tid, callback) {
     var script = "SELECT * FROM trips WHERE id=:1";
     oracle.connect(connectData, function(err, connection){
@@ -619,6 +639,7 @@ var database = {
 
   postTrip: dbPostTrip,
   getTrip: dbGetTrip,
+  updateTrip: dbUpdateTrip,
   getUserTrips: dbGetUserTrips,
   getTripInvites: dbGetTripInvites,
   getInvitedFriends: dbGetInvitedFriends,

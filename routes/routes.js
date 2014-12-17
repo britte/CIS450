@@ -53,13 +53,26 @@ var get_trip = function(req, res) {
     })
 }
 
+var get_trip_edit = function(req, res) {
+    var tid = req.params.trip;
+    db.getTrip(tid, function(trip, err) {
+        if (err) {
+            console.log("Error getting trip: " + err);
+            res.json({data: trip, err: !!err, errMsg: err});
+        } else {
+            res.render('trip-edit.ejs', { trip: trip });
+        }
+    })
+}
+
 var routes = {
     login: get_login,
     signup: get_signup,
     homepage: get_home,
     useredit: get_user_edit,
     addtrip: get_add_trip,
-    gettrip: get_trip
+    gettrip: get_trip,
+    tripedit: get_trip_edit
 }
 
 module.exports = routes;

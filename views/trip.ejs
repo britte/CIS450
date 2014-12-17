@@ -8,7 +8,7 @@
     <h1><%= trip.NAME %></h1>
     <% if (trip.OWNER == user.ID) { %>
         <div>
-            <button class="btn" onclick="location.href = '/trip-edit';"> Edit Info </button>
+            <button class="btn" onclick="location.href = '/trip-edit/<%=trip.ID%>';"> Edit Info </button>
         </div>
     <% } %>
     <div>

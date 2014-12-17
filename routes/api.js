@@ -135,6 +135,19 @@ var post_trip = function(req, res){
     });
 }
 
+var post_trip_update = function(req, res) {
+    var tid = req.params.trip,
+        name = req.body.name;
+    db.updateTrip(tid, name, function(data, err){
+        if (err){
+            console.log("Error updating user: " + err);
+            res.json({data: null, err: true, errMsg: 'Invalid data'})
+        } else {
+            res.redirect('/trip/' + tid);
+        }
+    });
+}
+
 var get_trips = function(req, res) {
     var uid = req.session.user.ID;
     db.getUserTrips(uid, function(data, err){
@@ -296,6 +309,7 @@ var api = {
     get_outstanding_requests: get_outstanding_requests,
 
     post_trip: post_trip,
+    post_trip_update: post_trip_update,
     get_trips: get_trips,
     post_trip_invite: post_trip_invite,
     post_update_trip_invite: post_update_trip_invite,
