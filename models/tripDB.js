@@ -111,13 +111,13 @@ var dbAddFriend = function(uid, fid, callback){
 //                 "SELECT * FROM dual";
     var script = "INSERT INTO friends " +
                  "(friend_date, friend_1, friend_2, status) " +
-                 "VALUES (:1, :2, :3, :4)";
+                 "VALUES (CURRENT_TIMESTAMP, :1, :2, :3)";
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
             console.log("Connected...");
             // TODO: create timestamp logic
-            connection.execute(script, [null, uid, fid, 0], function(err, results) {
+            connection.execute(script, [uid, fid, 0], function(err, results) {
                 if (err) { callback( null, err); }
                 else { callback(results, null); }
                 connection.close();
@@ -130,9 +130,9 @@ var dbAddFriend = function(uid, fid, callback){
 var dbConfirmFriendRequest = function(uid, rid, callback){
     var add_script = "INSERT INTO friends " +
                      "(friend_date, friend_1, friend_2, status) " +
-                     "VALUES (:1, :2, :3, :4)";
+                     "VALUES (CURRENT_TIMESTAMP, :1, :2, :3)";
         update_script = "UPDATE FRIENDS " +
-                        "SET STATUS = 1 " +
+                        "SET STATUS = 1, FRIEND_DATE = CURRENT_TIMESTAMP " +
                         "WHERE (FRIEND_1 = :1 AND FRIEND_2 = :2)";
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
@@ -140,7 +140,7 @@ var dbConfirmFriendRequest = function(uid, rid, callback){
             console.log("Connected...");
             console.log(uid)
             console.log(rid)
-            connection.execute(add_script, [null, uid, rid, 1], function(err, results) {
+            connection.execute(add_script, [uid, rid, 1], function(err, results) {
                 if (err) {
                     callback(null, err);
                     connection.close();
@@ -404,8 +404,8 @@ var dbRejectInviteRequest = function(tid, uid, callback){
 // ************************************************ //
 
 var dbPostAlbum = function(uid, tid, name, callback){
-    var script = "INSERT INTO albums (id, owner, trip, name) " +
-                 "SELECT MAX(id) + 1, :1, :2, :3 FROM albums";
+    var script = "INSERT INTO albums (id, owner, trip, name, creation_date) " +
+                 "SELECT MAX(id) + 1, :1, :2, :3, CURRENT_TIMESTAMP FROM albums";
                  console.log(uid)
                  console.log(tid)
                  console.log(name)
@@ -481,14 +481,14 @@ var dbGetUserAlbums = function(uid, callback){
 
  var dbPostMedia = function(uid, aid, video, url, private, callback){
      var script = "INSERT INTO media (id, owner, album, upload_date, is_video, media_url, privacy, num_hits) " +
-                  "SELECT MAX(id) + 1, :1, :2, :3, :4, :5, :6, :7 FROM media";
+                  "SELECT MAX(id) + 1, :1, :2, CURRENT_TIMESTAMP, :3, :4, :5, :6 FROM media";
      oracle.connect(connectData, function(err, connection){
          if (err) { console.log("Error connecting to db:" + err); }
          else {
              console.log("Connected...");
              var isVideo = video ? 1 : 0,
                  isPrivate = private ? 1 : 0;
-             connection.execute(script, [uid, aid, null, isVideo, url, isPrivate, 0], function(err, results) {
+             connection.execute(script, [uid, aid, isVideo, url, isPrivate, 0], function(err, results) {
                  if (err) { callback( null, err); }
                  else { callback(true, null); }
                  connection.close();
@@ -498,27 +498,27 @@ var dbGetUserAlbums = function(uid, callback){
      });
  }
 
-//var dbGetNewsFeed = function(user, callback){
-//    var script = "SELECT M.Media_Url " +
-//                 "FROM Users U " +
-//                 "INNER JOIN Friends F ON U.ID = F.Friend_1 " +
-//                 "INNER JOIN Media M ON M.Owner = F.Friend_2 " +
-//                 "WHERE U.ID = :1;"
-//    oracle.connect(connectData, function(err, connection){
-//        if (err) { console.log("Error connecting to db:" + err); }
-//        else {
-//            console.log("Connected...");
-//            connection.execute(script,
-//                               [user1.id],
-//                                function(err, results) {
-//                                    if (err) { callback(null, "Error getting news feed: " + err); }
-//                                    else { callback({user1: user1}, null); }
-//                                    connection.close();
-//                                    console.log("Connection closed.")
-//                                });
-//        }
-//    });
-//}
+var dbGetNewsFeed = function(user, callback){
+   var script = "SELECT M.Media_Url " +
+                "FROM Users U " +
+                "INNER JOIN Friends F ON U.ID = F.Friend_1 " +
+                "INNER JOIN Media M ON M.Owner = F.Friend_2 " +
+                "WHERE U.ID = :1;"
+   oracle.connect(connectData, function(err, connection){
+       if (err) { console.log("Error connecting to db:" + err); }
+       else {
+           console.log("Connected...");
+           connection.execute(script,
+                              [user.id],
+                               function(err, results) {
+                                   if (err) { callback(null, "Error getting news feed: " + err); }
+                                   else { callback({user1: user1}, null); }
+                                   connection.close();
+                                   console.log("Connection closed.")
+                               });
+       }
+   });
+}
 //
 //
 //var dbAddMedia = function(media, callback){
@@ -768,6 +768,8 @@ var database = {
   getUserAlbums: dbGetUserAlbums,
   getTripAlbums: dbGetTripAlbums,
   postMedia: dbPostMedia,
+
+  getNewsFeed: dbGetNewsFeed,
 
   updateCache: dbUpdateCachedMedia
 };
