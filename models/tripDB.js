@@ -9,6 +9,38 @@ var oracle = require('oracle'),
         password: "450password"
     };
 
+var generateId = function(script, callback){
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [], function(err, results) {
+                if (err) { callback(null, err); }
+                else { callback(results[0], null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
+var dbGetUserPrivacy = function(uid, fid, callback){
+    var script = "SELECT * FROM friends " +
+                 "WHERE (friend_1=:1 AND friend_2=:2 AND status=1)";
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [uid, fid], function(err, results) {
+                if (err) { callback(null, err); }
+                else { callback(results.length == 0, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
 // ************************************************ //
 //              LOGIN/SIGNUP LOGIC
 // ************************************************ //
@@ -72,27 +104,19 @@ var dbPostUser = function(user, callback){
 
 
 // TODO: improve validation
-var dbUpdateUser = function(user, opts, callback){
-    var pwdUpdate = opts.old_pwd === user.LOGIN &&
-                    opts.new_pwd_1.length > 0 &&
-                    opts.new_pwd_2.length > 0 &&
-                    (opts.new_pwd_1 === opts.new_pwd_2);
+var dbUpdateUser = function(uid, name, pwd, aff, callback){
     var script = "UPDATE users " +
                  "SET name=:1, affiliation=:2, pwd=:3 " +
-                 "WHERE login=:4";
-    var newname = opts["name"] || user.NAME.toString(),
-        newaff = opts["affiliation"] || (user.AFFILIATION ? user.AFFILIATION.toString() : null),
-        newpwd = (pwdUpdate ? opts["new_pwd_1"] : user.PWD.toString()),
-        login = user.LOGIN.toString();
+                 "WHERE id=:4";
     oracle.connect(connectData, function(err, connection){
         if (err) {
             console.log("Error connecting to db: " + err);
         } else {
             console.log("Connected...");
-                connection.execute(script, [newname, newaff, newpwd, login],
+                connection.execute(script, [name, aff, pwd, uid],
                     function(err2, results){
                         if(err2) { callback(null, err2); }
-                        else { callback(results[0], null);}
+                        else { callback(true, null);}
                         connection.close();
                         console.log("connection closed.");
                 });
@@ -138,8 +162,6 @@ var dbConfirmFriendRequest = function(uid, rid, callback){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
             console.log("Connected...");
-            console.log(uid)
-            console.log(rid)
             connection.execute(add_script, [uid, rid, 1], function(err, results) {
                 if (err) {
                     callback(null, err);
@@ -216,21 +238,86 @@ var dbGetFriendRequests = function(uid, callback) {
 //              TRIP LOGIC
 // ************************************************ //
 
-var dbPostTrip = function(uid, name, callback){
-    var script = "INSERT INTO trips (id, owner, start_date, end_date, name) " +
-                 "SELECT MAX(id) + 1, :1, :2, :3, :4  FROM trips";
+var dbGetValidLocation = function(location, callback) {
+    var script = "SELECT * FROM locations WHERE name=:1";
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
             console.log("Connected...");
-            connection.execute(script, [uid, null, null, name], function(err, results) {
+            connection.execute(script, [location], function(err, results) {
                 if (err) { callback( null, err); }
-                else { callback(true, null); }
+                else { callback(results[0] || false, null); }
                 connection.close();
                 console.log("Connection closed.")
             });
         }
     });
+}
+
+var dbPostLocation = function(location, callback) {
+    generateId("SELECT MAX(id) AS ID FROM locations", function(data, err){
+        if (err) { callback(null, err)}
+        else {
+            var script = "INSERT INTO locations (id, name) " +
+                         "VALUES (:1, :2)";
+            oracle.connect(connectData, function(err, connection){
+                if (err) { console.log("Error connecting to db:" + err); }
+                else {
+                    console.log("Connected...");
+                    var id = data.ID + 1;
+                    connection.execute(script, [id, location], function(err, results) {
+                        if (err) { callback( null, err); }
+                        else { callback(id, null); }
+                        connection.close();
+                        console.log("Connection closed.")
+                    });
+                }
+            });
+        }
+    });
+
+}
+
+var dbPostTrip = function(uid, name, lid, callback){
+    generateId("SELECT MAX(id) AS ID FROM trips", function(data, err){
+        if (err) {
+            console.log('generator')
+            callback(null, err)
+        } else {
+            var script = "INSERT INTO trips (id, owner, start_date, end_date, name) " +
+                         "VALUES (:1, :2, :3, :4, :5) ";
+            oracle.connect(connectData, function(err, connection){
+                if (err) { console.log("Error connecting to db:" + err); }
+                else {
+                    console.log("Connected...");
+                    var id = data.ID + 1;
+                    connection.execute(script, [id, uid, null, null, name], function(err, results) {
+                        if (err) { callback( null, err); }
+                         else { callback(id, null); }
+                                connection.close();
+                                console.log("Connection closed.")
+                    })
+                }
+            });
+        }
+    });
+}
+
+var dbPostTripTo = function(tid, lid, callback){
+   var script = "INSERT INTO trip_to (trip, location) " +
+                "VALUES (:1, :2)";
+   oracle.connect(connectData, function(err, connection){
+       if (err) { console.log("Error connecting to db:" + err); }
+       else {
+           console.log("Connected...");
+           connection.execute(script, [tid, lid], function(err, results) {
+               if (err) { callback( null, err); }
+                else { callback(true, null); }
+                       connection.close();
+                       console.log("Connection closed.")
+           })
+       }
+   });
 }
 
 var dbUpdateTrip = function(tid, name, callback){
@@ -254,7 +341,11 @@ var dbUpdateTrip = function(tid, name, callback){
 }
 
 var dbGetTrip = function(tid, callback) {
-    var script = "SELECT * FROM trips WHERE id=:1";
+    var script = "SELECT t.id, t.owner, t.name, l.name AS L_NAME, l.id AS L_ID " +
+                 "FROM trips t " +
+                 "INNER JOIN trip_to tt ON tt.trip = t.id " +
+                 "INNER JOIN locations l ON tt.location = l.id " +
+                 "WHERE t.id=:1";
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
@@ -286,7 +377,7 @@ var dbGetValidTrip = function(tname, callback) {
 }
 
 var dbGetUserTrips = function(uid, callback) {
-    var script = "SELECT t.id, t.name " +
+    var script = "SELECT t.id, t.name, t.owner " +
                  "FROM participate_trip pt " +
                  "INNER JOIN users u ON pt.invitee = u.id " +
                  "INNER JOIN trips t ON pt.trip = t.id " +
@@ -406,9 +497,6 @@ var dbRejectInviteRequest = function(tid, uid, callback){
 var dbPostAlbum = function(uid, tid, name, callback){
     var script = "INSERT INTO albums (id, owner, trip, name, creation_date) " +
                  "SELECT MAX(id) + 1, :1, :2, :3, CURRENT_TIMESTAMP FROM albums";
-                 console.log(uid)
-                 console.log(tid)
-                 console.log(name)
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
@@ -498,102 +586,141 @@ var dbGetUserAlbums = function(uid, callback){
      });
  }
 
-var dbGetNewsFeed = function(user, callback){
-   var script = "SELECT M.Media_Url " +
-                "FROM Users U " +
-                "INNER JOIN Friends F ON U.ID = F.Friend_1 " +
-                "INNER JOIN Media M ON M.Owner = F.Friend_2 " +
-                "WHERE U.ID = :1;"
-   oracle.connect(connectData, function(err, connection){
-       if (err) { console.log("Error connecting to db:" + err); }
-       else {
-           console.log("Connected...");
-           connection.execute(script,
-                              [user.id],
-                               function(err, results) {
-                                   if (err) { callback(null, "Error getting news feed: " + err); }
-                                   else { callback({user1: user1}, null); }
-                                   connection.close();
-                                   console.log("Connection closed.")
-                               });
-       }
-   });
+ var dbGetAlbumMedia = function(aid, callback){
+     var script =  "SELECT * FROM media WHERE album=:1";
+     oracle.connect(connectData, function(err, connection){
+         if (err) { console.log("Error connecting to db:" + err); }
+         else {
+             console.log("Connected...");
+             connection.execute(script, [aid], function(err, results) {
+                 if (err) { callback( null, err); }
+                 else { callback(results, null); }
+                 connection.close();
+                 console.log("Connection closed.")
+             });
+         }
+     });
+ }
+
+  var dbGetMedia = function(mid, callback){
+      var script =  "SELECT * FROM media WHERE id=:1";
+      oracle.connect(connectData, function(err, connection){
+          if (err) { console.log("Error connecting to db:" + err); }
+          else {
+              console.log("Connected...");
+              connection.execute(script, [mid], function(err, results) {
+                  if (err) { callback( null, err); }
+                  else { callback(results[0], null); }
+                  connection.close();
+                  console.log("Connection closed.")
+              });
+          }
+      });
+  }
+
+var dbAddMediaRating = function(rating, uid, mid, callback){
+    var script = "INSERT INTO RATE_MEDIA (rating, rater, media) " +
+                 "VALUES (:1, :2, :3)";
+
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [rating, uid, mid], function(err, results) {
+                if (err) { callback(null, err); }
+                else { callback({rating: rating}, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
 }
-//
-//
-//var dbAddMedia = function(media, callback){
-//    var script = "INSERT INTO MEDIA (id, owner, upload_date, is_video, media_url, privacy) " +
-//                 "SELECT MAX(id) + 1, :1, :2, :3, :4, :5  FROM MEDIA;";
-//    oracle.connect(connectData, function(err, connection){
-//        if (err) { console.log("Error connecting to db:" + err); }
-//        else {
-//            console.log("Connected...");
-//            connection.execute(script,
-//                               [media.owner ? media.owner : null,
-//                                media.upload_date ? media.upload.toString() : null,
-//                                media.is_video,
-//                                media.media_url.toString(),
-//                                media.privacy],
-//                                function(err, results) {
-//                                    if (err) { callback(null, "Error adding media: " + err); }
-//                                    else { callback({media: media}, null); }
-//                                    connection.close();
-//                                    console.log("Connection closed.")
-//                                });
-//        }
-//    });
-//}
-//
-//var dbAddComment = function(comment, is_media, callback){
-//    var media_script = "INSERT INTO COMMENT_MEDIA (media_comment, commenter, media) " +
-//                        "VALUES (:1, :2, :3)";
-//    var trip_script = "INSERT INTO COMMENT_TRIP (trip_comment, commenter, trip) " +
-//                        "VALUES (:1, :2, :3)";
-//    var script = is_media ? media_script : trip_script;
-//
-//    oracle.connect(connectData, function(err, connection){
-//        if (err) { console.log("Error connecting to db:" + err); }
-//        else {
-//            console.log("Connected...");
-//            connection.execute(script,
-//                               [is_media ? comment.media_comment.toString() : comment.trip_comment.toString(),
-//                               comment.commenter,
-//                               is_media ? comment.media : comment.trip],
-//                                function(err, results) {
-//                                    if (err) { callback(null, "Error adding comment: " + err); }
-//                                    else { callback({comment: comment}, null); }
-//                                    connection.close();
-//                                    console.log("Connection closed.")
-//                                });
-//        }
-//    });
-//
-//}
-//
-//var dbAddRating = function(rating, is_media, callback){
-//    var media_script = "INSERT INTO RATE_MEDIA (rating, rater, media) " +
-//                        "VALUES (:1, :2, :3)";
-//    var trip_script = "INSERT INTO RATE_TRIP (rating, rater, trip) " +
-//                        "VALUES (:1, :2, :3)";
-//    var script = is_media ? media_script : trip_script;
-//
-//    oracle.connect(connectData, function(err, connection){
-//        if (err) { console.log("Error connecting to db:" + err); }
-//        else {
-//            console.log("Connected...");
-//            connection.execute(script,
-//                               [rating.rating,
-//                               rating.rater,
-//                               is_media ? rating.media : rating.trip],
-//                                function(err, results) {
-//                                    if (err) { callback(null, "Error adding rating: " + err); }
-//                                    else { callback({rating: rating}, null); }
-//                                    connection.close();
-//                                    console.log("Connection closed.")
-//                                });
-//        }
-//    });
-//}
+
+var dbAddMediaComment = function(comment, uid, mid, callback){
+    var script = "INSERT INTO COMMENT_MEDIA (media_comment, commenter, media, timestamp) " +
+                 "VALUES (:1, :2, :3, CURRENT_TIMESTAMP)";
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [comment, uid, mid], function(err, results) {
+                if (err) { callback(null, err); }
+                else { callback({comment: comment}, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
+ var dbGetMediaComments = function(mid, callback){
+     var script =  "SELECT cm.media_comment, u.login AS U_LOGIN, u.name AS U_NAME " +
+                   "FROM comment_media cm " +
+                   "INNER JOIN users u ON u.id = cm.commenter " +
+                   "WHERE cm.media =:1";
+     oracle.connect(connectData, function(err, connection){
+         if (err) { console.log("Error connecting to db:" + err); }
+         else {
+             console.log("Connected...");
+             connection.execute(script, [mid], function(err, results) {
+                 if (err) { callback( null, err); }
+                 else { callback(results, null); }
+                 connection.close();
+                 console.log("Connection closed.")
+             });
+         }
+     });
+ }
+
+var dbGetNewsFeed = function(uid, callback){
+    var friend_script = "SELECT uf1.name as f1_name, uf1.id as f1_id, uf1.login as f1_login, " +
+                               "uf2.id as id, uf2.name as name, f2.friend_date as ts, uf2.login as misc, 'friend' as typ " +
+                        "FROM Users U " +
+                        "INNER JOIN Friends F ON (U.ID = F.Friend_1 AND status = 1) " +
+                        "INNER JOIN Friends f2 ON (f2.friend_1 = f.friend_2 OR f2.friend_2 = f.friend_2) " +
+                                               "AND (f2.friend_1 != u.id AND f2.friend_2 != u.id) " +
+                                               "AND f2.status = 1 " +
+                        "INNER JOIN users uf1 ON uf1.id = f2.friend_1 " +
+                        "INNER JOIN users uf2 ON uf2.id = f2.friend_2 " +
+                        "WHERE U.ID = :1"
+    var media_script = "SELECT fu.name as f_name, fu.id as f_id, fu.login as f_login, " +
+                               "a.id as id, a.name as name, a.creation_date as ts, null as misc, 'album' as typ " +
+                        "FROM Users U " +
+                        "INNER JOIN Friends F ON (U.ID = F.Friend_1 AND status = 1) " +
+                        "INNER JOIN Users fu ON f.friend_2 = fu.id " +
+                        "INNER JOIN Albums a on a.owner = f.friend_2 " +
+                        "WHERE U.ID = :1";
+    var trips_script = "SELECT fu.name as f_name, fu.id as f_id, fu.login as f_login, " +
+                              "t.id as id, t.name as name, t.creation_date as ts, l.name as misc, 'trip' as typ " +
+                       "FROM Users U " +
+                       "INNER JOIN Friends F ON (U.ID = F.Friend_1 AND status = 1) " +
+                       "INNER JOIN Users fu ON f.friend_2 = fu.id " +
+                       "INNER JOIN Trips t on t.owner = f.friend_2 " +
+                       "INNER JOIN trip_to tt on t.id = tt.trip " +
+                       "INNER JOIN locations l on tt.location = l.id " +
+                       "WHERE U.ID = :1";
+    var script = "WITH friend_news AS ("+friend_script+"), " +
+                 "media_news AS ("+media_script+"), " +
+                 "trips_news AS ("+trips_script+") " +
+                 "SELECT * FROM friend_news " +
+                 "UNION " +
+                 "SELECT * FROM media_news " +
+                 "UNION " +
+                 "SELECT * FROM trips_news "
+
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err);}
+        else {
+            console.log("Connected...");
+            connection.execute(script, [uid], function(err, results) {
+                if (err) { callback( null, err); }
+                else { callback(results, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
 
 var dbRecommendFriend = function(user, callback){
     var script = "SELECT R.NAME, R.LOGIN " +
@@ -655,39 +782,38 @@ var dbRecommendLocation = function(user, callback){
     });     
 }
 
-//var dbSearch = function(searchTerm, callback){
-//    var user_script = "SELECT U.id, U.name " +
-//                        "FROM USERS U " +
-//                        "WHERE U.name LIKE '%:1%'";
-//    var location_script = "SELECT L.id, L.name " +
-//                          "FROM LOCATIONS L " +
-//                          "WHERE L.name LIKE '%:1%'";
-//    var user_res = nil;
-//    var location_res = nil;
-//
-//    oracle.connect(connectData, function(err, connection){
-//        if (err) { console.log("Error connecting to db:" + err); }
-//        else {
-//            console.log("Connected...");
-//            connection.execute(user_script,
-//                               [searchTerm],
-//                                function(err, results) {
-//                                    if (err) { callback(null, "Error user search results: " + err); }
-//                                    else { user_res = results; }
-//                                    connection.close();
-//                                    console.log("Connection closed.")
-//                                });
-//            connection.execute(location_script,
-//                                [searchTerm],
-//                                function(err, results) {
-//                                    if(err) { callback(null, "Error location search results: " + err); }
-//                                    else { callback({user_results: user_res, location_results: results}, null); }
-//                                    connection.close();
-//                                    console.log("connection closed");
-//                                });
-//        }
-//    });
-//}
+var dbSearch = function(searchTerm, callback){
+   var user_script = "SELECT U.id, U.name, 'user' as typ " +
+                       "FROM USERS U " +
+                       "WHERE lower(U.name) LIKE '%:1%'";
+   var location_script = "SELECT L.id, L.name, 'loc' as typ" +
+                         "FROM LOCATIONS L " +
+                         "WHERE lower(L.name) LIKE '%:1%'";
+
+   var script = "WITH usersres AS (" + user_script + ")," +
+                    "locres AS (" + location_script + ")" +
+                    "SELECT * "+
+                    "FROM usersres " +
+                    "UNION " +
+                    "SELECT * " +
+                    "FROM locres";
+
+
+   oracle.connect(connectData, function(err, connection){
+       if (err) { console.log("Error connecting to db:" + err); }
+       else {
+           console.log("Connected...");
+           connection.execute(script,
+                              [searchTerm.toLowerCase()],
+                               function(err, results) {
+                                   if (err) { callback(null, "Error user search results: " + err); }
+                                   else { callback({results: results}, null); }
+                                   connection.close();
+                                   console.log("Connection closed.")
+                               });
+       }
+   });
+}
 
 var dbUpdateCachedMedia = function(callback){
     var script = "WITH sortedMedia AS( " +
@@ -752,7 +878,11 @@ var database = {
   confirmFriendRequest: dbConfirmFriendRequest,
   rejectFriendRequest: dbRejectFriendRequest,
 
+  postLocation: dbPostLocation,
+  getValidLocation: dbGetValidLocation,
+
   postTrip: dbPostTrip,
+  postTripTo: dbPostTripTo,
   getTrip: dbGetTrip,
   getValidTrip: dbGetValidTrip,
   updateTrip: dbUpdateTrip,
@@ -768,10 +898,17 @@ var database = {
   getUserAlbums: dbGetUserAlbums,
   getTripAlbums: dbGetTripAlbums,
   postMedia: dbPostMedia,
+  getAlbumMedia: dbGetAlbumMedia,
+  getMedia: dbGetMedia,
+  addMediaRating: dbAddMediaRating,
+  addMediaComment: dbAddMediaComment,
+  getMediaComments: dbGetMediaComments,
+
+  getUserPrivacy: dbGetUserPrivacy,
+
+  updateCache: dbUpdateCachedMedia,
 
   getNewsFeed: dbGetNewsFeed,
-
-  updateCache: dbUpdateCachedMedia
 };
 
 module.exports = database;

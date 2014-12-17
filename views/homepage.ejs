@@ -6,25 +6,27 @@
 </head>
 <body>
     <h1><%= user.NAME %></h1>
-    <% if (currentUser.LOGIN == user.LOGIN) { %>
+    <% if (private) { %>
+        <form action="/api/request-friend/<%=user.ID%>" method="post">
+            <input class="btn" type="submit" value="Request Friend">
+        </form>
+        You are not friends with this user yet. Add them to see their profile.
+    <% } else {%>
+        <% if (user.AFFILIATION) { %>
+            <p>Affiliation: <%= user.AFFILIATION %></p>
+            <br/>
+        <% } %>
         <div>
-            <button class="btn" onclick="location.href = '/user-edit';"> Edit Info </button>
-        </div>
-    <% } else if (currentUser.LOGIN) { %>
-        <div>
-            <button class="btn" onclick="postFriendRec"> Request Friend </button>
+            <% if (currentUser) { %>
+                <button class="btn" onclick="location.href = '/user-edit';"> Edit Info </button>
+            <% } %>
+            <button class="btn" onclick="location.href = '/friends';"> Friends </button>
+            <button class="btn" onclick="location.href = '/albums';"> Albums </button>
+            <button class="btn" onclick="location.href = '/trips';"> Trips </button>
+            <button class="btn" onclick="location.href = '/friendrequests';"> Friend Requests </button>
+            <button class="btn" onclick="location.href = '/invites';"> Trip Invites </button>
         </div>
     <% } %>
-    <div>
-    <% if (user.AFFILIATION) { %>
-        Affiliation: <%= user.AFFILIATION %>
-    <% } %>
-    </div>
 <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
-<!--<script>-->
-    <!--var postFriendRec = $.post( "/api/request-friend/<%=user.ID%>", function( data ) {-->
-        <!--alert('Request sent')-->
-    <!--});-->
-<!--</script>-->
 </body>
 </html>

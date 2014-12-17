@@ -4,39 +4,53 @@ var _ = require('underscore');
 
 var get_login = function(req, res) { res.render('login.ejs', {}) }
 
-var get_signup = function(req, res) { res.render('signup.ejs', { user: {} }) }
+var get_signup = function(req, res) { res.render('signup.ejs', { user: {} , err: null}) }
 
 var get_home = function(req, res) {
-    var user = req.params.user,
-        currentUser = req.session.user || {};
-
-    db.getUser(user, null, function(user, err){
-        if (err) {
-            res.redirect('/')
-        } else {
-            // TODO: add friend status logic
-            res.render('homepage.ejs', {user: user,
-                                        currentUser: currentUser})
-        }
-    })
+    var currentUser = req.session.user || res.redirect('/'),
+        login = req.params.user;
+    if (currentUser && login == currentUser.LOGIN) {
+        res.render('homepage.ejs', {user: currentUser,
+                                    currentUser: true,
+                                    private: false})
+    } else {
+        db.getUser(login, null, function(user, err){
+            if (err) {
+                console.log("Error getting user: " + err);
+            } else {
+                db.getUserPrivacy(currentUser.ID, user.ID, function(private, err){
+                    if (err) {
+                        res.redirect('/homepage/' + currentUser.LOGIN)
+                    } else {
+                        res.render('homepage.ejs', {user: user,
+                                                    currentUser: false,
+                                                    private: private})
+                    }
+                })
+            }
+        })
+    }
 }
 
 var get_user_edit = function(req, res) {
-    res.render('user-edit.ejs', { user: req.session.user || {}})
+    var user = req.session.user || res.redirect('/');
+    res.render('user-edit.ejs', { user: user })
 }
 
 var get_add_trip = function(req, res) {
+    var user = req.session.user || res.redirect('/');
     res.render('add-trip.ejs', {})
 }
 
 var get_trip = function(req, res) {
-    var tid = req.params.trip,
-        user = req.session.user;
+    var user = req.session.user || res.redirect('/'),
+        tid = req.params.trip;
     db.getTrip(tid, function(trip, err){
         if (err) {
             console.log("Error getting trip: " + err);
             res.json({data: trip, err: !!err, errMsg: err});
-        } else {
+        } else if (trip) {
+            console.log(trip)
             db.getInvitedFriends(tid, function(friends, err){
                 if (err) {
                     console.log("Error getting invited friends: " + err);
@@ -49,12 +63,15 @@ var get_trip = function(req, res) {
                                             })
                 }
             })
+        } else {
+            res.render('error.ejs', {err: 'No such trip exists'})
         }
     })
 }
 
 var get_trip_edit = function(req, res) {
-    var tid = req.params.trip;
+    var user = req.session.user || res.redirect('/'),
+        tid = req.params.trip;
     db.getTrip(tid, function(trip, err) {
         if (err) {
             console.log("Error getting trip: " + err);
@@ -66,21 +83,50 @@ var get_trip_edit = function(req, res) {
 }
 
 var get_album = function(req, res) {
-    var aid = req.params.album;
-    db.getAlbum(aid, function(data, err){
+    var user = req.session.user || res.redirect('/'),
+        aid = req.params.album;
+    db.getAlbum(aid, function(album, err){
         if (err) {
-            console.log("Error getting trip: " + err);
+            console.log("Error getting album: " + err);
             res.json({data: data, err: !!err, errMsg: err});
         } else {
-            res.render('album.ejs', {album: data,
-                                     media: [],
-                                     user: req.session.user})
+            db.getAlbumMedia(aid, function(media, err){
+                 if (err) {
+                    console.log("Error getting media: " + err);
+                    res.json({data: data, err: !!err, errMsg: err});
+                 } else {
+                      res.render('album.ejs', {album: album,
+                                               media: media,
+                                               user: req.session.user})
+                 }
+            })
         }
     })
 }
 
 var get_add_album = function(req, res) {
+    var user = req.session.user || res.redirect('/');
     res.render('add-album.ejs', {})
+}
+
+var get_media = function(req, res) {
+    var user = req.session.user || res.redirect('/'),
+        mid = req.params.media;
+    db.getMedia(mid, function(media, err){
+        if (err) {
+            console.log("Error getting media: " + err);
+            res.json({data: null, err: !!err, errMsg: err});
+        } else {
+            db.getMediaComments(mid, function(comments, err){
+                if (err) {
+                    console.log("Error getting media: " + err);
+                    res.json({data: null, err: !!err, errMsg: err});
+                } else {
+                    res.render('media.ejs', {media: media, comments: comments, user: user})
+                }
+            });
+        }
+    });
 }
 
 var routes = {
@@ -94,7 +140,8 @@ var routes = {
     tripedit: get_trip_edit,
 
     addalbum: get_add_album,
-    album: get_album
+    album: get_album,
+    media: get_media
 }
 
 module.exports = routes;

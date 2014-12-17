@@ -8,14 +8,12 @@ var _ = require('underscore');
 var get_login = function(req, res) {
     var login = req.query.login,
         pwd = req.query.pwd;
-        console.log(req.query)
     db.getUser(login, pwd, function(user, err) {
         if (user) {
-        // TODO: swap
             req.session.user = user;
             res.redirect('/homepage/' + user.LOGIN);
         } else {
-            res.render('/', { error: err })
+            res.redirect('/')
         }
     })
 }
@@ -24,39 +22,47 @@ var get_login = function(req, res) {
 var post_user = function(req, res) {
     var user = req.body;
     if (!user.name || !user.login || !user.pwd) {
-        res.json({data: null, err: true, errMsg: 'Invalid data'})
+        res.render('signup.ejs', {err: 'Invalid data'})
     }
     // Check that username doesn't exist
-    db.getUserExists(req.body.login, function(data, err) {
+    db.getUserExists(user.login, function(data, err) {
         if (!data) {
-            // Validation data
-            if (!user.name || !user.login || !user.pwd) {
-                res.json({data: null, err: true, errMsg: 'Invalid data'})
-            } else {
-                // Create user
-                db.postUser(user, function(data, err){
-                    if (data) {
-                        req.session.user = user;
-                        res.redirect('/homepage/' + user.login)
-                    } else {
-                        res.json({data: data, err: !!err, errMsg: err})
-                    }
-                })
-            }
+            // Create user
+            db.postUser(user, function(data, err){
+                if (data) {
+                    req.session.user = user;
+                    res.redirect('/homepage/' + user.login)
+                } else {
+                    res.render('signup.ejs', {err: err})
+                }
+            })
         } else {
-            res.json({data: null, err: !!err, errMsg: 'User already exists'})
+            res.render('signup.ejs', {err: 'User already exists'})
         }
     });
 }
 
 // Edit a user's information
 var put_user_update = function(req, res) {
-    db.updateUser(req.session.user, req.body, function(data, err){
+    var user = req.session.user || res.redirect('/'),
+        pwdUpdate = (req.body.old_pwd === user.PWD &&
+                     req.body.new_pwd_1.length > 0 &&
+                     req.body.new_pwd_2.length > 0 &&
+                     (req.body.new_pwd_1 === req.body.new_pwd_2)),
+        pwd = (pwdUpdate ? req.body.new_pwd_1 : user.PWD.toString()),
+        name = req.body.name || user.NAME.toString(),
+        aff = req.body.affiliation || (user.AFFILIATION ? user.AFFILIATION.toString() : null),
+        uid = user.ID;
+    db.updateUser(uid, name, pwd, aff, function(data, err){
         if (err){
             console.log("Error updating user: " + err);
             res.json({data: null, err: true, errMsg: 'Invalid data'})
         } else {
-            res.redirect('/homepage/' + req.session.user.LOGIN);
+            // Update session cookie
+            req.session.user.AFFILIATION = aff;
+            req.session.user.PWD = pwd;
+            req.session.user.NAME = name;
+            res.redirect('/homepage/' + user.LOGIN);
         }
     });
 }
@@ -67,7 +73,8 @@ var put_user_update = function(req, res) {
 
 // Get all friends for a user
 var get_friends = function(req, res) {
-    var uid = req.session.user.ID;
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID;
     db.getFriends(uid, function(friends, err){
         if (err) {
             console.log("Error finding friends: " + err)
@@ -85,7 +92,8 @@ var get_friends = function(req, res) {
 
 // Send a friend request
 var post_friend_request = function(req, res) {
-    var uid = req.session.user.ID,
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
         fid = req.params.friend;
     db.postFriendRequest(uid, fid, function(data, err){
         if(err){
@@ -98,7 +106,8 @@ var post_friend_request = function(req, res) {
 
 // Respond to a friend request
 var post_update_friend_request = function(req, res){
-    var uid = req.session.user.ID,
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
         rid = req.params.requester,
         decision = !!req.params.decision;
     if (decision) {
@@ -121,7 +130,8 @@ var post_update_friend_request = function(req, res){
 }
 
 var get_outstanding_requests = function(req, res) {
-    var uid = req.session.user.ID;
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID;
     db.getFriendRequests(uid, function(data, err){
         if (err) {
             console.log("Error finding invites: " + err)
@@ -136,19 +146,61 @@ var get_outstanding_requests = function(req, res) {
 // ************************************************ //
 
 var post_trip = function(req, res){
-    var uid = req.session.user.ID,
-        name = req.body.name;
-    db.postTrip(uid, name, function(data, err){
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
+        name = req.body.name,
+        location = req.body.location;
+    db.getValidLocation(location, function(loc, err){
+        console.log(loc)
         if(err){
-            console.log("Error creating a trip: " + err);
+            console.log("Error finding location: " + err);
+            res.json({data: null, err: !!err, errMsg: err});
+        } else if (!loc) {
+            db.postLocation(location, function(locId, err){
+                if(err){
+                    console.log("Error creating a location: " + err);
+                    res.json({data: null, err: !!err, errMsg: err});
+                } else {
+                    db.postTrip(uid, name, locId, function(tripId, err){
+                        if(err){
+                            console.log("Error creating a trip: " + err);
+                            res.json({data: null, err: !!err, errMsg: err});
+                        } else {
+                            db.postTripTo(tripId, locId, function(data, err){
+                                if(err){
+                                    console.log("Error creating a trip: " + err);
+                                    res.json({data: null, err: !!err, errMsg: err});
+                                } else {
+                                    res.redirect('/trip/'+tripId);
+                                }
+                            });
+                        }
+                    });
+                }
+            })
         } else {
-            res.json({data: data, err: !!err, errMsg: err});
+            db.postTrip(uid, name, loc.ID, function(tripId, err){
+                if(err){
+                    console.log("Error creating a trip: " + err);
+                    res.json({data: null, err: !!err, errMsg: err});
+                } else {
+                    db.postTripTo(tripId, loc.ID, function(data, err){
+                        if(err){
+                            console.log("Error creating a trip: " + err);
+                            res.json({data: null, err: !!err, errMsg: err});
+                        } else {
+                            res.redirect('/trip/'+tripId);
+                        }
+                    });
+                }
+            });
         }
-    });
+    })
 }
 
 var post_trip_update = function(req, res) {
-    var tid = req.params.trip,
+    var user = req.session.user || res.redirect('/'),
+        tid = req.params.trip,
         name = req.body.name;
     db.updateTrip(tid, name, function(data, err){
         if (err){
@@ -161,18 +213,20 @@ var post_trip_update = function(req, res) {
 }
 
 var get_trips = function(req, res) {
-    var uid = req.session.user.ID;
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID;
     db.getUserTrips(uid, function(data, err){
         if (err) {
             console.log("Error finding trips: " + err)
         } else {
-            res.render('trips.ejs', {trips: data})
+            res.render('trips.ejs', {trips: data, user: user})
         }
     })
 }
 
 var post_trip_invite = function(req, res) {
-    var uid = req.session.user.ID,
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
         fid = req.params.friend,
         tid = req.params.trip;
     db.postTripInvite(uid, fid, tid, null, function(data, err){
@@ -185,7 +239,8 @@ var post_trip_invite = function(req, res) {
 }
 
 var get_outstanding_invites = function(req, res) {
-    var uid = req.session.user.ID;
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID;
     db.getTripInvites(uid, false, function(data, err){
         if (err) {
             console.log("Error finding invites: " + err)
@@ -196,7 +251,8 @@ var get_outstanding_invites = function(req, res) {
 }
 
 var post_update_trip_invite = function(req, res){
-    var uid = req.session.user.ID,
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
         tid = req.params.trip,
         decision = !!req.params.decision;
     if (decision) {
@@ -224,7 +280,8 @@ var post_update_trip_invite = function(req, res){
 // ************************************************ //
 
 var post_album = function(req, res){
-    var uid = req.session.user.ID,
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
         tname = req.body.trip,
         name = req.body.name;
     db.getValidTrip(tname, function(trip, err) {
@@ -252,7 +309,8 @@ var post_album = function(req, res){
 }
 
 var get_albums = function(req, res) {
-    var uid = req.session.user.ID,
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
         tid = req.params.trip;
     db.getUserAlbums(uid, function(userAlbums, err){
         if (err) {
@@ -271,7 +329,8 @@ var get_albums = function(req, res) {
 }
 
 var post_media = function(req, res){
-    var uid = req.session.user.ID,
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
         aid = req.body.album,
         url = req.body.url,
         video = !!req.body.video,
@@ -286,49 +345,47 @@ var post_media = function(req, res){
     })
 }
 
+var post_media_rating = function(req, res){
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
+        mid = req.params.media,
+        rating = req.body.rating;
+    db.addMediaRating(rating, uid, mid, function(data, err){
+        if(err) {
+            console.log("Error adding rating: " + err);
+            res.json({data: data, err: !!err, errMsg: err});
+        } else {
+            res.redirect("/media/"+mid)
+        }
+    });
+}
 
-//var add_media = function(req, res){
-//    var
-//    db.addMedia(req.body.media, function(data, err){
-//        if(err) {
-//            console.log("Error adding media: ");
-//        } else {
-//            res.json({data: data, err: !!err, errMsg: err});
-//        }
-//    });
-//}
+var post_media_comment = function(req, res){
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
+        mid = req.params.media,
+        comment = req.body.comment;
+    db.addMediaComment(comment, uid, mid, function(data, err){
+        if(err) {
+            console.log("Error adding comment: " + err);
+            res.json({data: data, err: !!err, errMsg: err});
+        } else {
+            res.redirect("/media/"+mid)
+        }
+    });
+}
 
 var get_news_feed = function(req, res){
-   db.getNewsFeed(req.body, function(data, err){
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID;
+    db.getNewsFeed(uid, function(data, err){
         if(err){
-            console.log("error getting news feed");
+            console.log("Error getting news feed");
         } else {
-            res.render('newsfeed.ejs', {feed: data})
+            res.json({feed: data})
         }
-   });
+    });
 }
-//
-//var add_comment = function(req, res){
-//    db.addComment(req.body.comment, req.body.is_media, function(data, err){
-//        if(err){
-//            var type = req.body.is_media ? "media" : "trip";
-//            console.log("error adding comment to " + type);
-//        } else {
-//            res.json({data: data, err: !!err, errMsg: err});
-//        }
-//    });
-//}
-//
-//var add_rating = function(req, res){
-//    db.addRating(req.body.rating, req.body.is_media, function(data, err){
-//        if(err) {
-//            var type = req.body.is_media ? "media" : "trip";
-//            console.log("error adding rating to " + type);
-//        } else {
-//            res.json({data: data, err: !!err, errMsg: err});
-//        }
-//    });
-//}
 
 var update_cache = function(req, res){
     db.updateCache(function(data, err){
@@ -418,7 +475,9 @@ var api = {
     post_album: post_album,
     get_albums: get_albums,
     post_media: post_media,
-//    get_news_feed: get_news_feed
+    post_media_rating: post_media_rating,
+    post_media_comment: post_media_comment,
+    get_news_feed: get_news_feed
 };
 
 module.exports = api;

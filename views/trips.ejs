@@ -11,7 +11,9 @@
     <h2>Your Trips</h2>
     <% for (i = 0; i < trips.length; i++) { %>
         <% var t = trips[i] %>
-        <li><a href="/trip/<%=t.ID%>"><%= t.NAME %></a></li>
+        <li>
+            <a href="/trip/<%=t.ID%>"><%= t.NAME %></a>
+            <% if (user.ID == t.OWNER) { %>(owner)<% } %>
     <% } %>
 </div>
 <script src="/bootstrap/dist/js/bootstrap.min.js"></script>

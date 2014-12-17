@@ -31,7 +31,7 @@ app.get('/trip-edit/:trip', routes.tripedit)
 
 app.get('/add-album', routes.addalbum);
 app.get('/album/:album', routes.album);
-
+app.get('/media/:media', routes.media);
 
 
 app.get('/friends', api.get_friends);
@@ -39,7 +39,7 @@ app.get('/trips', api.get_trips);
 app.get('/albums/:trip?', api.get_albums);
 app.get('/friendrequests', api.get_outstanding_requests);
 app.get('/invites', api.get_outstanding_invites);
-
+app.get('/newsfeed', api.get_news_feed);
 
 
 // API routes
@@ -57,6 +57,8 @@ app.post('/api/respond-trip-invite/:trip/:decision?', api.post_update_trip_invit
 
 app.post('/api/postalbum', api.post_album);
 app.post('/api/postmedia', api.post_media);
+app.post('/api/post-media-rating/:media', api.post_media_rating);
+app.post('/api/post-media-comment/:media', api.post_media_comment);
 
 // listen on port 8081
 app.listen(8081);

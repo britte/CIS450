@@ -6,13 +6,14 @@
 </head>
 <body>
     <h1><%= trip.NAME %></h1>
+    <h3><%= trip.L_NAME %></h3>
     <% if (trip.OWNER == user.ID) { %>
         <div>
             <button class="btn" onclick="location.href = '/trip-edit/<%=trip.ID%>';"> Edit Info </button>
         </div>
     <% } %>
     <div>
-        <h4>Confirmed</h4>
+        <h4>Confirmed Attendees</h4>
         <% for (i = 0; i < confirmed.length; i++) { %>
             <% var f = confirmed[i] %>
             <li><a href="/homepage/<%=f.LOGIN%>"><%= f.NAME %></a>
@@ -23,7 +24,7 @@
                 <% } %>
             </li>
         <% } %>
-        <h4>Pending</h4>
+        <h4>Pending Attendees</h4>
         <% for (i = 0; i < pending.length; i++) { %>
             <% var f = pending[i] %>
             <li><a href="/homepage/<%=f.LOGIN%>"><%= f.NAME %></a></li>
