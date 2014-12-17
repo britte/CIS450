@@ -1,5 +1,8 @@
 var db = require('../models/tripDB.js');
 var mango = require('../models/mongoDB.js');
+var MongoClient = require('mongodb').MongoClient;
+var url = 'mongodb://127.0.0.1:27017/';
+
 var _ = require('underscore');
 
 var get_login = function(req, res) {
@@ -260,7 +263,39 @@ var update_cache = function(req, res){
             cacheMap["first"] = [data[0].id, data[0].media_url];
             cacheMap["second"] = [data[1].id, data[1].media_url];
             cacheMap["third"] = [data[2].id, data[2].media_url];
-            res.json({data: cacheMap, err: !!err, errMsg: err});
+            if(req.body.first_time){
+                MongoClient.connect(url, {native_parser:true}, function(err, mangodb) {
+                    if(err){
+                        console.log("error with mongo client for inserting");
+                    } else {
+                        mango.insertTrio(mangodb, cacheMap, function(results){
+                            if(!results){
+                                console.log("error inserting trio");
+                            } else {
+                                console.log("trio inserted successfully");
+                            }
+                        });
+                    }
+                });
+            } else {
+                MongoClient.connect(url, {native_parser:true}, function(err, mangodb){
+                    if(err){
+                        console.log("error with mongo client for updating");
+                    } else {
+                        var docs = nil;
+                        mango.getAll(db, function(results){
+                            docs = results;
+                        });
+                        mango.update(mangodb, docs[0], data[0], function(results){
+                            if(!results){
+                                console.log("error updating");
+                            } else {
+                                console.log("updated correctly");
+                            }
+                        });
+                    }
+                });
+            }
         }
     });
 }

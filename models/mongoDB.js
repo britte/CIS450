@@ -5,24 +5,25 @@ var assert = require('assert');
 // Connection URL
 var url = 'mongodb://127.0.0.1:27017/';
 // Use connect method to connect to the Server
-MongoClient.connect(url, {native_parser:true}, function(err, db) {
-	if (err) {
-		console.log("qq: " + err);
-	}
-  	console.log("Connected correctly to server");
-  	insertDocuments(db, ['a', 'b', 'c'], function() {
-        findDocuments(db, function() {
-        	removeDocument(db, function(){
-        		updateDocument(db, function(){
-        			findDocuments(db, function(){
-        				db.close();
-        			});
-        		});
-        	});
-        });
-	});
+// MongoClient.connect(url, {native_parser:true}, function(err, db) {
+// 	if (err) {
+// 		console.log("qq: " + err);
+// 	}
+//   	console.log("Connected correctly to server");
+//   	insertDocuments(db, ['a', 'b', 'c'], function() {
+//         findDocuments(db, function() {
+//         	removeDocument(db, function(){
+//         		updateDocument(db, function(){
+//         			findDocuments(db, function(){
+//         				db.close();
+//         			});
+//         		});
+//         	});
+//         });
+// 	});
 
-});
+// });
+
 
 var insertDocuments = function(db, medias, callback) {
   // Get the documents collection
