@@ -61,6 +61,10 @@ var put_user_update = function(req, res) {
     });
 }
 
+// ************************************************ //
+//                FRIEND LOGIC
+// ************************************************ //
+
 // Get all friends for a user
 var get_friends = function(req, res) {
     var uid = req.session.user.ID;
@@ -126,6 +130,10 @@ var get_outstanding_requests = function(req, res) {
         }
     })
 }
+
+// ************************************************ //
+//                TRIP LOGIC
+// ************************************************ //
 
 var post_trip = function(req, res){
     var uid = req.session.user.ID,
@@ -210,22 +218,75 @@ var post_update_trip_invite = function(req, res){
     }
 }
 
-//
 
-//var get_news_feed = function(req, res){
-//    db.getNewsFeed(req.body, function(data, err){
-//        if(err){
-//            console.log("error getting news feed");
+// ************************************************ //
+//                MEDIA LOGIC
+// ************************************************ //
+
+var post_album = function(req, res){
+    var uid = req.session.user.ID,
+        tname = req.body.trip,
+        name = req.body.name;
+    db.getValidTrip(tname, function(trip, err) {
+        if (err) {
+            console.log("Error creating album: " + err)
+            res.json({data: trip, err: !!err, errMsg: err});
+        } else {
+            // Only create album if a trip exists
+            if (trip) {
+                db.postAlbum(uid, trip.ID, name, function(data, err){
+                    if (err) {
+                        console.log("Error creating album: " + err)
+                        res.json({data: data, err: !!err, errMsg: err});
+                    } else {
+                        redirect("/albums", {});
+                    }
+                })
+            } else {
+                var err = 'Trip does not exist.'
+                console.log("Error creating album: " + err )
+                res.json({data: data, err: !!err, errMsg: err});
+            }
+        }
+    })
+}
+
+var get_albums = function(req, res) {
+    var uid = req.session.user.ID,
+        tid = req.params.trip;
+    db.getUserAlbums(uid, function(userAlbums, err){
+        if (err) {
+            console.log("Error fetching user albums: " + err)
+        } else {
+            db.getTripAlbums(uid, function(tripAlbums, err){
+                if(err){
+                    console.log("Error fetching trip albums: " + err);
+                } else {
+                    console.log(tripAlbums)
+                    res.render('albums.ejs', {trip: tripAlbums, user: userAlbums})
+                }
+            });
+        }
+    })
+}
+
+
+
+//var add_media = function(req, res){
+//    var
+//    db.addMedia(req.body.media, function(data, err){
+//        if(err) {
+//            console.log("Error adding media: ");
 //        } else {
 //            res.json({data: data, err: !!err, errMsg: err});
 //        }
 //    });
 //}
-//var add_media = function(req, res){
-//
-//    db.addMedia(req.body.media, function(data, err){
-//        if(err) {
-//            console.log("error adding media");
+
+//var get_news_feed = function(req, res){
+//    db.getNewsFeed(req.body, function(data, err){
+//        if(err){
+//            console.log("error getting news feed");
 //        } else {
 //            res.json({data: data, err: !!err, errMsg: err});
 //        }
@@ -338,6 +399,9 @@ var api = {
     post_trip_invite: post_trip_invite,
     post_update_trip_invite: post_update_trip_invite,
     get_outstanding_invites: get_outstanding_invites,
+
+    post_album: post_album,
+    get_albums: get_albums
 //    get_news_feed: get_news_feed
 };
 

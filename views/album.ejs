@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+    <h1><%= album.NAME %></h1>
+    <% if (album.OWNER == user.ID) { %>
+        <div>
+            <button class="btn" onclick="location.href = '/album-edit/<%=album.ID%>';"> Edit Info </button>
+        </div>
+    <% } %>
+<!--<div>-->
+    <!--<% for (i = 0; i < media.length; i++) { %>-->
+    <!--<% var p = media[i] %>-->
+    <!--<img width="100" src="<%=p.media_url%>">-->
+    <!--<% } %>-->
+<!--</div>-->
+<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -269,6 +269,22 @@ var dbGetTrip = function(tid, callback) {
     });
 }
 
+var dbGetValidTrip = function(tname, callback) {
+    var script = "SELECT * FROM trips WHERE name=:1";
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [tname], function(err, results) {
+                if (err) { callback( null, err); }
+                else { callback(results[0], null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
 var dbGetUserTrips = function(uid, callback) {
     var script = "SELECT t.id, t.name " +
                  "FROM participate_trip pt " +
@@ -382,6 +398,85 @@ var dbRejectInviteRequest = function(tid, uid, callback){
         }
     });
 }
+
+// ************************************************ //
+//                MEDIA LOGIC
+// ************************************************ //
+
+var dbPostAlbum = function(uid, tid, name, callback){
+    var script = "INSERT INTO albums (id, owner, trip, name) " +
+                 "SELECT MAX(id) + 1, :1, :2, :3 FROM albums";
+                 console.log(uid)
+                 console.log(tid)
+                 console.log(name)
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [uid, tid, name], function(err, results) {
+                if (err) { callback( null, err); }
+                else { callback(true, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
+var dbGetAlbum = function(aid, callback){
+    var script = "SELECT * FROM albums WHERE id=:1";
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db: " + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [aid], function(err, results) {
+                if (err) { callback(null, err); }
+                else { callback(results[0], null) }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
+var dbGetUserAlbums = function(uid, callback){
+     var script = "SELECT * FROM albums WHERE owner=:1";
+     oracle.connect(connectData, function(err, connection){
+         if (err) { console.log("Error connecting to db: " + err); }
+         else {
+             console.log("Connected...");
+             connection.execute(script, [uid], function(err, results) {
+                 if (err) { callback(null, err); }
+                 else { callback(results, null)}
+                 connection.close();
+                 console.log("Connection closed.")
+             });
+         }
+     });
+ }
+
+ var dbGetTripAlbums = function(uid, callback){
+     var script = "SELECT UNIQUE a.name, a.id, a.id AS OID, " +
+                                "o.name AS ONAME, o.login AS OLOGIN, " +
+                                "t.name AS TNAME, t.id AS TID " +
+                  "FROM participate_trip pt " +
+                  "INNER JOIN users u ON (pt.inviter = :1 OR pt.invitee = :1) " +
+                  "INNER JOIN trips t ON pt.trip = t.id " +
+                  "INNER JOIN albums a ON (a.trip = t.id AND a.owner !=:1) " +
+                  "INNER JOIN users o ON o.id = a.owner";
+     oracle.connect(connectData, function(err, connection){
+         if (err) { console.log("Error connecting to db: " + err); }
+         else {
+             console.log("Connected...");
+             connection.execute(script, [uid], function(err, results) {
+                 if (err) { callback(null, err); }
+                 else { callback(results, null)}
+                 connection.close();
+                 console.log("Connection closed.")
+             });
+         }
+     });
+ }
 
 //var dbGetNewsFeed = function(user, callback){
 //    var script = "SELECT M.Media_Url " +
@@ -639,6 +734,7 @@ var database = {
 
   postTrip: dbPostTrip,
   getTrip: dbGetTrip,
+  getValidTrip: dbGetValidTrip,
   updateTrip: dbUpdateTrip,
   getUserTrips: dbGetUserTrips,
   getTripInvites: dbGetTripInvites,
@@ -646,6 +742,11 @@ var database = {
   postTripInvite: dbInviteTrip,
   confirmInviteRequest: dbConfirmInviteRequest,
   rejectInviteRequest: dbRejectInviteRequest,
+
+  postAlbum: dbPostAlbum,
+  getAlbum: dbGetAlbum,
+  getUserAlbums: dbGetUserAlbums,
+  getTripAlbums: dbGetTripAlbums,
 
   updateCache: dbUpdateCachedMedia
 };

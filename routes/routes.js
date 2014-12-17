@@ -65,14 +65,34 @@ var get_trip_edit = function(req, res) {
     })
 }
 
+var get_album = function(req, res) {
+    var aid = req.params.aid;
+    db.getAlbum(aid, function(data, err){
+        if (err) {
+            console.log("Error getting trip: " + err);
+            res.json({data: data, err: !!err, errMsg: err});
+        } else {
+            res.render('album.ejs', {media: data.media, album: data.album})
+        }
+    })
+}
+
+var get_add_album = function(req, res) {
+    res.render('add-album.ejs', {})
+}
+
 var routes = {
     login: get_login,
     signup: get_signup,
     homepage: get_home,
     useredit: get_user_edit,
+
     addtrip: get_add_trip,
     gettrip: get_trip,
-    tripedit: get_trip_edit
+    tripedit: get_trip_edit,
+
+    addalbum: get_add_album,
+    album: get_album
 }
 
 module.exports = routes;
