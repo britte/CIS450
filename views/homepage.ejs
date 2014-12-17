@@ -2,10 +2,42 @@
 <html>
 <head>
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+
+  <script>
+    $( "#searchForm" ).submit(function( event ) {
+ 
+        // Stop form from submitting normally
+        event.preventDefault();
+ 
+        // Get some values from elements on the page:
+        var $form = $( this ),
+            term = $form.find( "input[name='searchTerm']" ).val(),
+            url = $form.attr( "action" );
+ 
+          // Send the data using post
+        var getting = $.get( url, { searchTerm: term } );
+ 
+        // Put the results in a div
+        getting.done(function( data ) {
+            var content = $( data ).find( "#data" );
+            $( "#result" ).empty().append( content );
+        });
+    });
+  </script>
+
   <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
 </head>
 <body>
     <h1><%= user.NAME %></h1>
+    <form action='/api/search' method="post" id="searchForm">
+        <input name="searchTerm" type ="text">
+        <input class='btn' type="submit" value="search" onClick="doshit()">
+    </form>
+
+    <div id="result">
+
+    </div>
     <% if (private) { %>
         <form action="/api/request-friend/<%=user.ID%>" method="post">
             <input class="btn" type="submit" value="Request Friend">

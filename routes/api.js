@@ -443,15 +443,15 @@ var update_cache = function(req, res){
 //    });
 //}
 //
-//var search = function(req, res){
-//    db.search(req.body.searchTerm, function(data, err){
-//        if(err) {
-//            console.log("error during user/location search");
-//        } else {
-//            res.json(data: data, err: !!err, errMsg: err);
-//        }
-//    });
-//}
+var search = function(req, res){
+   db.search(req.body.searchTerm, function(data, err){
+       if(err) {
+           console.log("error during user/location search");
+       } else {
+           res.json({data: data, err: !!err, errMsg: err});
+       }
+   });
+}
 
 
 
