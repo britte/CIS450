@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+<div>
+</div>
+<div id="friends">
+    <h2>Your Trips</h2>
+    <% for (i = 0; i < trips.length; i++) { %>
+        <% var t = trips[i] %>
+        <li><a href="/trip/<%=t.ID%>"><%= t.NAME %></a></li>
+    <% } %>
+</div>
+<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
