@@ -283,15 +283,15 @@ var get_albums = function(req, res) {
 //    });
 //}
 
-//var get_news_feed = function(req, res){
-//    db.getNewsFeed(req.body, function(data, err){
-//        if(err){
-//            console.log("error getting news feed");
-//        } else {
-//            res.json({data: data, err: !!err, errMsg: err});
-//        }
-//    });
-//}
+var get_news_feed = function(req, res){
+   db.getNewsFeed(req.body, function(data, err){
+        if(err){
+            console.log("error getting news feed");
+        } else {
+            res.render('newsfeed.ejs', {feed: data})
+        }
+   });
+}
 //
 //var add_comment = function(req, res){
 //    db.addComment(req.body.comment, req.body.is_media, function(data, err){
