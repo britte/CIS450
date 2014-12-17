@@ -579,7 +579,6 @@ var dbUpdateCachedMedia = function(callback){
     });     
 }
 
-<<<<<<< Updated upstream
 var dbUpdateCachedMedia = function(callback){
     var script = "WITH sortedMedia AS( " +
                  "SELECT * " +
@@ -604,9 +603,6 @@ var dbUpdateCachedMedia = function(callback){
         }
     });     
 }
-
-=======
->>>>>>> Stashed changes
 
 var database = {
   getUser: dbGetUser,

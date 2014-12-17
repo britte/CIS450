@@ -193,6 +193,8 @@ var post_update_trip_invite = function(req, res){
     }
 }
 
+//
+
 //var get_news_feed = function(req, res){
 //    db.getNewsFeed(req.body, function(data, err){
 //        if(err){
@@ -202,18 +204,6 @@ var post_update_trip_invite = function(req, res){
 //        }
 //    });
 //}
-//
-//
-//var respond_to_trip_invite = function(req, res){
-//    db.updateTripInvite(req.body.user1, req.body.user2, req.body.trip, req.body.decision, function(data, err){
-//        if(err){
-//            console.log("error updating invite");
-//        } else {
-//            res.json({data: data, err: !!err, errMsg: err});
-//        }
-//    });
-//}
-//
 //var add_media = function(req, res){
 //
 //    db.addMedia(req.body.media, function(data, err){
@@ -261,12 +251,6 @@ var update_cache = function(req, res){
     });
 }
 
-//var get_users = function(req, res) {
-//    db.users(function(data, err) {
-//        if (err) {
-//            console.log('fuck it')
-//        } else if (data) {
-//            res.json(data);
 //var recommend_location = function(req, res){
 //    db.recommendLocation(req.body.user, function(data, err){
 //        if(err){
