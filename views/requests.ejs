@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+<div>
+</div>
+<div id="friends">
+    <h2>Outstanding Friend Requests</h2>
+    <% for (i = 0; i < requests.length; i++) { %>
+        <% var r = requests[i] %>
+        <li>
+        <a href="/homepage/<%=r.LOGIN%>"><%= r.NAME %></a>
+        <form action="/api/respond-friend-request/<%=r.ID%>/confirm" method="post">
+            <input class="btn" type="submit" value="Confirm">
+        </form>
+        <form action="/api/respond-friend-request/<%=r.ID%>" method="post">
+            <input class="btn" type="submit" value="Reject">
+        </form>
+        </li>
+    <% } %>
+</div>
+<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

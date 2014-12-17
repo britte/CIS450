@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+    <h1>Add Trip</h1>
+    <form action="/api/posttrip" method="post">
+        Name: <input type="text" maxlength="20" name="name">
+        <br/>
+        <br/>
+        Start Date:
+        <select name="s_m">
+            <option value="0" selected>Jan</options>
+            <% var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; %>
+            <% for (m = 1; m < 12; m ++) { %>
+            <option value="<%=m%>"><%=months[m]%></option>
+            <% } %>
+        </select>
+        <select name="s_d">
+            <option value="1" selected>1</option>
+            <% for (d = 2; d < 32; d ++) { %>
+            <option value="<%=d%>"><%=d%></option>
+            <% } %>
+        </select>
+        <select name="s_y">
+            <option value="2014" selected>2014</option>
+            <% for (y = 2015; y < 2026; y ++) { %>
+            <option value="<%=y%>"><%=y%></option>
+            <% } %>
+        </select>
+        </br>
+        </br>
+        End Date:
+        <select name="e_m">
+            <option value="0" selected>Jan</options>
+            <% var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; %>
+            <% for (m = 1; m < 12; m ++) { %>
+            <option value="<%=m%>"><%=months[m]%></option>
+            <% } %>
+        </select>
+        <select name="e_d">
+            <option value="1" selected>1</option>
+            <% for (d = 2; d < 32; d ++) { %>
+            <option value="<%=d%>"><%=d%></option>
+            <% } %>
+        </select>
+        <select name="e_y">
+            <option value="2014" selected>2014</option>
+            <% for (y = 2015; y < 2026; y ++) { %>
+            <option value="<%=y%>"><%=y%></option>
+            <% } %>
+        </select>
+        </br>
+        </br>
+        Location: <input type="text" name="location">
+        </br>
+        </br>
+        <input class="btn" type="submit" value="Create Trip">
+    </form>
+    </br>
+<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

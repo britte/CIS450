@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <h1>Edit Profile</h1>
+  <form action="/api/user-edit" method="post">
+     Username: <input type="text" name="name" value="<%= user.NAME %>">
+     Affiliation: <input type="text" name="affiliation" value="<% user.AFFILIATION ? user.AFFILIATION : ''%>">
+     Old Password: <input type="password" name="old_pwd">
+     New Password: <input type="password" name="new_pwd_1">
+     Retype New Password: <input type="password" name="new_pwd_2">
+     <input class="btn" type="submit" value="Update" >
+  </form>
+  <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
