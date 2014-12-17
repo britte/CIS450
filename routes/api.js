@@ -1,4 +1,5 @@
 var db = require('../models/tripDB.js');
+var mango = require('../models/mongoDB.js');
 
 var get_user = function(req, res) {
     var login = req.params.login,
