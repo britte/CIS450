@@ -674,7 +674,7 @@ var dbAddMediaComment = function(comment, uid, mid, callback){
  }
 
 var dbGetNewsFeed = function(uid, callback){
-    var friend_script = "SELECT uf1.name as f1_name, uf1.id as f1_id, uf1.login as f1_login, " +
+    var friend_script = "SELECT uf1.name as f_name, uf1.id as f_id, uf1.login as f_login, " +
                                "uf2.id as id, uf2.name as name, f2.friend_date as ts, uf2.login as misc, 'friend' as typ " +
                         "FROM Users U " +
                         "INNER JOIN Friends F ON (U.ID = F.Friend_1 AND status = 1) " +
@@ -710,10 +710,11 @@ var dbGetNewsFeed = function(uid, callback){
                  "SELECT * FROM trips_news "
 
     oracle.connect(connectData, function(err, connection){
-        if (err) { console.log("Error connecting to db:" + err);}
+        if (err) { console.log("Error connecting to db: " + err);}
         else {
             console.log("Connected...");
             connection.execute(script, [uid], function(err, results) {
+                console.log(results)
                 if (err) { callback( null, err); }
                 else { callback(results, null); }
                 connection.close();
@@ -785,27 +786,25 @@ var dbRecommendLocation = function(user, callback){
 
 var dbSearch = function(searchTerm, callback){
    var user_script = "SELECT U.id, U.name, 'user' as typ " +
-                       "FROM USERS U " +
-                       "WHERE lower(U.name) LIKE '%:1%'";
-   var location_script = "SELECT L.id, L.name, 'loc' as typ" +
+                     "FROM USERS U " +
+                     "WHERE lower(U.name) LIKE '%:1%'";
+   var location_script = "SELECT L.id, L.name, 'loc' as typ " +
                          "FROM LOCATIONS L " +
                          "WHERE lower(L.name) LIKE '%:1%'";
 
-   var script = "WITH usersres AS (" + user_script + ")," +
-                    "locres AS (" + location_script + ")" +
-                    "SELECT * "+
-                    "FROM usersres " +
-                    "UNION " +
-                    "SELECT * " +
-                    "FROM locres";
-
+   var script = "WITH usersres AS (" + user_script + "), " +
+                "locres AS (" + location_script + ") " +
+                "SELECT * FROM usersres " +
+                "UNION " +
+                "SELECT * FROM locres";
 
    oracle.connect(connectData, function(err, connection){
        if (err) { console.log("Error connecting to db:" + err); }
        else {
            console.log("Connected...");
-           connection.execute(script,
-                              [searchTerm.toLowerCase()],
+           var term = searchTerm.toString().toLowerCase();
+           console.log(script)
+           connection.execute(script, [term],
                                function(err, results) {
                                    if (err) { callback(null, "Error user search results: " + err); }
                                    else { callback({results: results}, null); }
@@ -866,6 +865,45 @@ var dbUpdateCachedMedia = function(callback){
     });     
 }
 
+// ************************************************ //
+//                MIXED PAGE LOGIC
+// ************************************************ //
+
+var dbGetAllPending = function(uid, confirmed, callback) {
+
+    var invites_script = "SELECT t.name, t.id, null as login, 'trip' as typ " +
+                         "FROM participate_trip pt " +
+                         "INNER JOIN trips t ON pt.trip = t.id " +
+                         "INNER JOIN users u ON pt.invitee = u.id " +
+                         "WHERE (pt.status =:1 AND u.id =:2)";
+
+    var requests_script = "SELECT f.name, f.id, f.login, 'friend' as typ " +
+                          "FROM users u " +
+                          "INNER JOIN friends uf ON uf.friend_2 = u.id " +
+                          "INNER JOIN users f ON f.id = uf.friend_1 " +
+                          "WHERE (uf.status =:1 AND u.id =:2)";
+
+    var script = "WITH invites AS ("+invites_script+"), " +
+                 "requests AS ("+requests_script+") " +
+                 "SELECT * FROM invites " +
+                 "UNION " +
+                 "SELECT * FROM requests";
+
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            var status = confirmed ? 1 : 0;
+            connection.execute(script, [status, uid], function(err, results) {
+                if (err) { callback( null, err); }
+                else { callback(results, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
 var database = {
   getUser: dbGetUser,
   getUserExists: dbGetUserExists,
@@ -910,6 +948,8 @@ var database = {
   updateCache: dbUpdateCachedMedia,
 
   getNewsFeed: dbGetNewsFeed,
+  getAllPending: dbGetAllPending,
+  search: dbSearch
 };
 
 module.exports = database;

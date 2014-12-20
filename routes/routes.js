@@ -9,10 +9,17 @@ var get_signup = function(req, res) { res.render('signup.ejs', { user: {} , err:
 var get_home = function(req, res) {
     var currentUser = req.session.user || res.redirect('/'),
         login = req.params.user;
-    if (currentUser && login == currentUser.LOGIN) {
-        res.render('homepage.ejs', {user: currentUser,
-                                    currentUser: true,
-                                    private: false})
+    if (currentUser && login == currentUser.LOGIN || login == currentUser.login) {
+        db.getNewsFeed(currentUser.ID, function(news, err){
+            if (err){res.redirect('/')}
+            else {
+                res.render('homepage.ejs', {user: currentUser,
+                                            currentUser: true,
+                                            private: false,
+                                            news: _.sortBy(news, function(n){ return -n.TS })
+                                            })
+            }
+        })
     } else {
         db.getUser(login, null, function(user, err){
             if (err) {
@@ -22,9 +29,17 @@ var get_home = function(req, res) {
                     if (err) {
                         res.redirect('/homepage/' + currentUser.LOGIN)
                     } else {
-                        res.render('homepage.ejs', {user: user,
-                                                    currentUser: false,
-                                                    private: private})
+                        db.getNewsFeed(user.ID, function(news, err){
+                            if (err){res.redirect('/')}
+                            else {
+                                console.log(news)
+                                res.render('homepage.ejs', {user: user,
+                                                            currentUser: false,
+                                                            private: private,
+                                                            news: _.sortBy(news, function(n){ return -n.TS })
+                                                            })
+                            }
+                        })
                     }
                 })
             }
