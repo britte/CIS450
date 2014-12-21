@@ -61,10 +61,11 @@ tripApp.controller('AlbumCtrl', function($scope, $http, $routeParams, $location)
             $scope.err = true;
             $scope.errMsg = err.msg;
         });
-    $scope.media = {}
+    $scope.newMedia = {}
     $scope.addMedia = function(){
-        console.log($scope.media)
-        $http.post('/api/post-media/'+$scope.album.ID, media)
+        $scope.newMedia.video = !!$scope.newMedia.video;
+        $scope.newMedia.private = !!$scope.newMedia.private;
+        $http.post('/api/post-media/'+$scope.album.ID, $scope.newMedia)
             .success(function() {
                 console.log('Success')
             })
@@ -96,6 +97,7 @@ tripApp.controller('MediaCtrl', function($scope, $http, $routeParams, $location)
             $scope.err = true;
             $scope.errMsg = err.msg;
         });
+
     $scope.rateMedia = function(){
         $http.post('/api/post-media-rating/'+$scope.media.ID, {rating: $scope.rating})
             .success(function() {

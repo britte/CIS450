@@ -75,7 +75,7 @@ var get_albums = function(req, res) {
 
 var get_media = function(req, res) {
     var user = req.session.user || res.redirect('/'),
-        mid = req.params.media;
+        mid = req.params.id;
     db.getMedia(mid, function(media, err){
         if (err) {
             res.status(500).send({ msg : "Error fetching user's media: " + err });
@@ -98,6 +98,7 @@ var post_media = function(req, res){
         url = req.body.url,
         video = req.body.video,
         private = req.body.private;
+
     db.postMedia(uid, aid, video, url, private, function(trip, err) {
         if (err) {
             res.status(500).send({ msg : "Error adding media to album: " + err });

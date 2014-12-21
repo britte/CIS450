@@ -22,13 +22,11 @@
                         <form role="form" ng-submit="addMedia()">
                             <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" type="text" placeholder="URL" ng-model="media.url">
+                                    <input class="form-control" type="text" placeholder="URL" ng-model="newMedia.url">
                                 </div>
                                 <div class="form-group">
-                                    <input type="checkbox" ng-model="media.video">
-                                </div>
-                                <div class="form-group">
-                                    <input type="checkbox" ng-model="media.checkbox">
+                                    Video <input type="checkbox" ng-model="newMedia.video">
+                                    Private <input type="checkbox" ng-model="newMedia.private">
                                 </div>
                                 <button class="btn btn-lg btn-success btn-block">Upload Media</button>
                             </fieldset>
