@@ -279,6 +279,44 @@ var dbRejectInviteRequest = function(tid, uid, callback){
     });
 }
 
+var dbPostDream = function(uid, lid, rank, callback){
+    var script = "INSERT INTO DREAMS(dream_date, dreamer, location, rank) " +
+                 "VALUES (CURRENT_TIMESTAMP, :1, :2, :3)";
+
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [uid, lid, rank], function(err, results) {
+                if (err) { callback(null, err); }
+                else { callback(true, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });    
+}
+
+var dbGetDreams = function(uid, callback){
+    var script = "SELECT L.id, L.name" +
+                 "FROM DREAMS D" +
+                 "INNER JOIN Locations L ON L.id = D.Location" +
+                 "WHERE D.Dreamer = :1;"
+
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script, [uid], function(err, results) {
+                if (err) { callback(null, err); }
+                else { callback(results, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });    
+}
+
 var database = {
     postLocation: dbPostLocation,
     getValidLocation: dbGetValidLocation,
