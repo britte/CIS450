@@ -211,20 +211,34 @@ var dbRecommendLocation = function(user, callback){
 }
 
 var dbSearch = function(searchTerm, callback){
-   var user_script = "SELECT U.id, U.name, 'user' as typ " +
+    var user_script = "SELECT U.id, U.name, 'user' as typ " +
                      "FROM USERS U " +
                      "WHERE lower(U.name) LIKE :1";
-   var location_script = "SELECT L.id, L.name, 'loc' as typ " +
+    var location_script = "SELECT L.id, L.name, 'loc' as typ " +
                          "FROM LOCATIONS L " +
                          "WHERE lower(L.name) LIKE :1";
 
-   var script = "WITH usersres AS (" + user_script + "), " +
-                "locres AS (" + location_script + ") " +
+    var trip_script = "SELECT T.id, T.name, 'trip' as typ" +
+                      "FROM TRIPS T" +
+                      "WHERE lower(T.name) LIKE :1";
+
+    var media_script = "SELECT A.id, A.name, 'album' as typ" +
+                       "FROM ALBUMS A" +
+                       "WHERE lower(A.name) LIKE :1";
+
+    var script = "WITH usersres AS (" + user_script + "), " +
+                "locres AS (" + location_script + "), " +
+                "tripres AS (" + trip_script + "), " +
+                "albumres AS (" + media_script + ") " +
                 "SELECT * FROM usersres " +
                 "UNION " +
-                "SELECT * FROM locres";
+                "SELECT * FROM locres" +
+                "UNION" + 
+                "SELECT * FROM tripres" +
+                "UNION" +
+                "SELECT * FROM albumres";
 
-   oracle.connect(connectData, function(err, connection){
+    oracle.connect(connectData, function(err, connection){
        if (err) { console.log("Error connecting to db:" + err); }
        else {
            console.log("Connected...");
@@ -237,7 +251,7 @@ var dbSearch = function(searchTerm, callback){
                console.log("Connection closed.")
            });
        }
-   });
+    });
 }
 
 var dbLocationSearch = function(searchTerm, callback){
