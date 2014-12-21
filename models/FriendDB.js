@@ -66,7 +66,7 @@ var dbGetFriendTrips = function(uid, callback) {
                  "INNER JOIN fr ON fr.id = t.owner " +
                  "UNION " +
                  "SELECT pt.trip FROM PARTICIPATE_TRIP pt " +
-                 "INNER JOIN fr ON fr.id = pt.invitee AND pt.status > 0" +
+                 "INNER JOIN fr ON fr.id = pt.invitee AND pt.status > 0 " +
                  "MINUS " +
                  tripsYouWentOn;
     oracle.connect(connectData, function(err, connection){
