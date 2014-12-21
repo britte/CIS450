@@ -209,11 +209,7 @@ var database = {
   confirmFriendRequest: dbConfirmFriendRequest,
   getFriendRequests: dbGetFriendRequests,
   rejectFriendRequest: dbRejectFriendRequest,
-<<<<<<< HEAD
-  getFriendRecs: dbRecommendFriend
-=======
   getFriendRecs: dbRecommendFriend,
->>>>>>> All about dat css
 };
 
 module.exports = database;
