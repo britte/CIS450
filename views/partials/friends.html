@@ -1,0 +1,12 @@
+<div id="friends">
+    <h2>Your Friends</h2>
+    <li ng-repeat="f in friends">
+        <a href="/homepage/{{f.LOGIN}}">{{ f.NAME }}</a>
+    </li>
+</div>
+<div id="recs">
+    <h2>Your Friend Recommendations</h2>
+    <li ng-repeat="r in recs">
+        <a href="/homepage/{{r.LOGIN}}">{{ r.NAME }}</a>
+    </li>
+</div>

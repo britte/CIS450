@@ -1,0 +1,17 @@
+<h1>Pending Requests</h1>
+<div>
+    <h4>Trip Invites</h4>
+    <li ng-repeat="t in trips">
+        <a href="/trip/{{t.ID}}">{{ t.NAME }}</a>
+        <button class="btn" ng-click="confirmInvite(t.ID)">Confirm</button>
+        <button class="btn" ng-click="rejectInvite(t.ID)">Reject</button>
+    </li>
+</div>
+<div >
+    <h4>Friend Requests</h4>
+    <li ng-repeat="f in friends">
+        <a href="/homepage/{{f.LOGIN}}">{{ f.NAME }}</a>
+        <button class="btn" ng-click="confirmRequest(f.ID)">Confirm</button>
+        <button class="btn" ng-click="rejectRequest(f.ID)">Reject</button>
+    </li>
+</div>

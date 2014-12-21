@@ -1,0 +1,53 @@
+<div ng-show="!!user">
+   <h1>{{ user.NAME }}</h1>
+    <form action='/api/search' method="post" id="searchForm">
+        <input name="searchTerm" type ="text">
+        <input class='btn' type="submit" value="search" onClick="doshit()">
+    </form>
+
+    <div id="result">
+
+    </div>
+    <div ng-show="private">
+        <form ng-click="requestFriend()" method="post">
+            <input class="btn" type="submit" value="Request Friend">
+        </form>
+        You are not friends with this user yet. Add them to see their profile.
+    </div>
+    <div ng-show="!private">
+        <p ng-show="user.AFFILIATION">Affiliation: {{ user.AFFILIATION }}</p>
+        <br/>
+        <div class="col-xs-12">
+            <button class="btn" onclick="location.href = '/user-edit';" ng-show="canEdit"> Edit Info </button>
+            <button class="btn" onclick="location.href = '/friends';"> Friends </button>
+            <button class="btn" onclick="location.href = '/albums';"> Albums </button>
+            <button class="btn" onclick="location.href = '/trips';"> Trips </button>
+            <button class="btn" onclick="location.href = '/pending';"> Pending Requests </button>
+        </div>
+    </div>
+
+    <div ng-show="!!news" class="col-xs-12">
+        <div ng-repeat="n in news">
+            <div ng-switch on="n.TYP">
+                <div ng-switch-when="friend">
+                    <li>
+                        <a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> and
+                        <a href="/homepage/{{n.MISC}}">{{n.NAME}}</a> just became friends!
+                    </li>
+                </div>
+                <div ng-switch-when="trip">
+                    <li>
+                        <a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> just created a new trip:
+                        <a href="/trip/{{n.ID}}">{{n.NAME}}</a>
+                    </li>
+                </div>
+                <div ng-switch-when="album">
+                    <li>
+                        <a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> just created a new album:
+                        <a href="/album/{{n.ID}}">{{n.NAME}}</a>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

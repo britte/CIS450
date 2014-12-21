@@ -1,0 +1,20 @@
+<h1>Edit Profile</h1>
+<form ng-submit="edit()">
+    <p ng-if="err" style="color:red">{{ errMsg }}</p>
+    Username: <input type="text" ng-model="name" value="{{ user.NAME }}">
+    <br/>
+    <br/>
+    Affiliation: <input type="text" ng-model="affiliation" value="{{ user.AFFILIATION ? user.AFFILIATION : ''}}">
+    <br/>
+    <br/>
+    New Password: <input type="password" ng-model="new_pwd_1">
+    <br/>
+    <br/>
+    Retype New Password: <input type="password" ng-model="new_pwd_2">
+    <br/>
+    <br/>
+    Old Password: <input type="password" ng-model="old_pwd">
+    <br/>
+    <br/>
+    <input class="btn" type="submit" value="Update" >
+</form>

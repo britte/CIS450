@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+    <h1>Welcome to TripApp!</h1>
+
+	<p ng-if="err" style="color:red">{{ errMsg }}</p>
+
+    <form ng-submit="signup()" method="post">
+        Name: <input type="text" ng-model="name" placeholder="Lizzy B">
+        <br/><br/>
+        Login: <input type="text" ng-model="login" placeholder="lizbiz">
+        <br/><br/>
+        Affiliation: <input type="text" ng-model="affiliation" placeholder="UPenn">
+        <br/><br/>
+        Password: <input type="password" ng-model="pwd">
+        <br/><br/>
+        <input class="btn" type="submit" value="Sign up" >
+    </form>
+    <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

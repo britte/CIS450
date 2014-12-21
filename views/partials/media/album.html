@@ -1,0 +1,22 @@
+<h1>{{ album.NAME }}</h1>
+    <div ng-show="album.OWNER == currentUser.ID">
+        <button class="btn" onclick="location.href = '/album-edit/{{album.ID}}';"> Edit Info </button>
+    </div>
+<form ng-submit="addMedia()">
+    URL: <input type="text" ng-model="url">
+    </br>
+    </br>
+    Video: <input type="checkbox" ng-model="video">
+    </br>
+    </br>
+    Private: <input type="checkbox" ng-model="private">
+    </br>
+    </br>
+    <input type="hidden" ng-model="album" value="{{album.ID}}">
+    <input class="btn" type="submit" value="Add Media">
+</form>
+<div>
+    <div ng-repeat="m in media">
+        <a href="/media/{{m.ID}}"><img width="200" src="{{m.MEDIA_URL}}"></a>
+    </div>
+</div>

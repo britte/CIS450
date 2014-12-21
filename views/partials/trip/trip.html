@@ -1,0 +1,30 @@
+<div ng-show="!!trip">
+    <h1>{{ trip.NAME }}</h1>
+    <h3>{{ trip.L_NAME }}</h3>
+    <div>
+        <button class="btn"
+                ng-click="location.href = '/trip-edit/{{trip.ID}}';"
+                ng-show="trip.OWNER == getUser().ID">
+            Edit Info
+        </button>
+    </div>
+<!--TODO: attendees-->
+    <div>
+        <h4>Confirmed Attendees</h4>
+
+        <li ng-repeat="f in confirmed">
+            <a href="/homepage/{{f.LOGIN}}">{{ f.NAME }}</a>
+            <!--TODO leaveTrip-->
+            <button class="btn" ng-click="leaveGroup()">Leave Trip</button>
+        </li>
+
+        <h4>Pending Attendees</h4>
+        <li ng-repeat="f in pending"><a href="/homepage/{{f.LOGIN}}">{{ f.NAME }}</a></li>
+
+        <h4>Friends to Invite</h4>
+        <li ng-repeat="f in uninvited">
+            <a href="/homepage/{{f.LOGIN}}">{{ f.NAME }}</a>
+            <button class="btn" ng-click="inviteFriend(f.ID)">Invite</button>
+        </li>
+    </div>
+</div>

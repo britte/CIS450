@@ -1,0 +1,17 @@
+<h1>Albums</h1>
+<a href="/add-album">Add New Album</a>
+<div id="user">
+    <h3>Your Albums</h3>
+        <li ng-repeat="a in albums">
+            <a href="/album/{{a.ID}}">{{ a.NAME }}</a>
+        </li>
+</div>
+<div id="trip">
+    <h3>Albums For Your Trips</h3>
+    <li ng-repeat="a in trip-albums">
+        <a href="/album/{{a.ID}}">{{ a.NAME }}</a>
+        from <a href="/homepage/{{a.OLOGIN}}">{{a.ONAME}}'s</a>
+        trip <a href="/trip/{{a.TID}}">{{a.TNAME}}</a>
+        </a>
+    </li>
+</div>

@@ -1,0 +1,9 @@
+<h1>Login</h1>
+<form ng-submit="login()" method="get">
+ Username: <input type="text" ng-model="user">
+ Password: <input type="password" ng-model="pwd">
+ <input class="btn" type="submit" value="Login">
+</form>
+<p ng-if="err" style="color:red">Error: {{ errMsg }}</p>
+<br>
+<a href="/signup"> Sign up here! </a>
