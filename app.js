@@ -44,8 +44,8 @@ app.get('/api/friend-trips', friend_api.get_friend_trips);
 
 // Trip API
 app.post('/api/post-trip', trip_api.post_trip);
-app.post('/api/get-valid-location', trip_api.get-valid-location);
-app.post('/api/post-location', trip_api.post-location);
+app.post('/api/get-valid-location', trip_api.get_valid_location);
+app.post('/api/post-location', trip_api.post_location);
 app.post('/api/post-trip-edit/:id', trip_api.post_trip_update);
 app.get('/api/trip/:id', trip_api.get_trip);
 app.get('/api/trip-invited/:id', trip_api.get_trip_invited)
