@@ -1,4 +1,4 @@
-var db = require('../../models/TripDB.js');
+var db = require('../../models/tripDB.js');
 var _ = require('underscore');
 
 // ************************************************ //
