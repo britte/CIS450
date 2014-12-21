@@ -724,12 +724,75 @@ var dbGetNewsFeed = function(uid, callback){
 }
 
 var dbRecommendFriend = function(user, callback){
-    var script = "SELECT R.NAME, R.LOGIN " +
+    var script1 = "WITH recs1 AS (" 
+                 "SELECT R.NAME, R.LOGIN " +
                  "FROM USERS U " +
                  "INNER JOIN FRIENDS F ON U.id = F.FRIEND_1 " +
                  "INNER JOIN FRIENDS F2 ON F2.FRIEND_1 = F.FRIEND_2 " +
                  "INNER JOIN USERS R ON R.ID = F2.FRIEND_2 " +
-                 "WHERE U.id =:1 AND NOT (U.id = F2.FRIEND_2) AND F.STATUS = 1";
+                 "WHERE U.id =:1 AND NOT (U.id = F2.FRIEND_2) AND F.STATUS = 1" +
+                 ")";
+
+    var script2 = ", peopleFriendsWithUser AS( " +
+                  "SELECT F.FRIEND_2 as id " +
+                  "FROM USERS U " +
+                  "INNER JOIN FRIENDS F ON F.FRIEND_1 = U.ID " +
+                  "WHERE U.ID = :1 " +
+                  "), peopleNotFriendsWithUser AS ( " +
+                  "SELECT U.ID " +
+                  "FROM USERS U " +
+                  "MINUS " +
+                  "(" +
+                  "SELECT *" +
+                  "FROM peopleFriendsWithUser PFWU" +
+                  "UNION " +
+                  "SELECT U.id" +
+                  "FROM USERS U" +
+                  "WHERE U.id = :1 " +
+                  ")" +
+                  "), tripsYouWentOn AS (" +
+                  "SELECT *" +
+                  "FROM TRIPS T" +
+                  "WHERE T.OWNER = :1" +
+                  "), peopleOnThoseTrips AS (" +
+                  "SELECT PT.INVITEE as id" +
+                  "FROM tripsYouWentOn TYWO " +
+                  "INNER JOIN PARTICIPATE_TRIP PT ON PT.TRIP = TYWO.ID" +
+                  "), peopleWhoWentAndArentFriends AS (" +
+                  "SELECT *" +
+                  "FROM peopleNotFriendsWithUser" +
+                  "INTERSECT" +
+                  "SELECT * " +
+                  "FROM peopleOnThoseTrips" +
+                  "), recs2 AS (" +
+                  "SELECT U.name, U.login" +                  
+                  "FROM USERS U" +
+                  "INNER JOIN peopleWhoWentAndArentFriends PWWAAF ON U.id = PWWAAF.id" +
+                  ")";
+
+    var script3 = ", peopleWithSameAff AS ( " +
+                  "SELECT R.id " +
+                  "FROM USERS U, USERS R " +
+                  "WHERE U.id = 106 AND R.affiliation = U.affiliation  " +
+                  "), peopleSameAffNonFriend AS ( " +
+                  "SELECT * " +
+                  "FROM peopleWithSameAff PWSA " +
+                  "INTERSECT " +
+                  "SELECT * " +
+                  "FROM peopleNotFriendsWithUser PNFWU " +
+                  "), recs3 AS ( " +
+                  "SELECT U.name, U.login " +
+                  "FROM USERS U " +
+                  "INNER JOIN peopleSameAffNonFriend PSANF ON PSANF.id = U.id " +
+                  ") ";
+
+    var script = script1 + script2 + script3 +
+                 "SELECT * " +
+                 "FROM recs1 " +
+                 "UNION " +
+                 "SELECT *" +
+                 "FROM recs2;";
+
     var id = user.ID;
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
@@ -864,6 +927,48 @@ var dbUpdateCachedMedia = function(callback){
                                 });
         }
     });     
+}
+
+var dbPostDream = function(user, location, rank, callback){
+    var script = "insert into DREAMS (dream_date, dreamer, location, rank) " +
+                 "VALUES (CURRENT_TIMESTAMP, :1, :2, :3);";
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script,
+                               [user, location, rank],
+                                function(err, results) {
+                                    if (err) { callback(null, "Error adding dream: " + err); }
+                                    else { callback({media: results}, null); }
+                                    connection.close();
+                                    console.log("Connection closed.")
+                                });
+        }
+    });    
+
+}
+
+var getDreams = function(user, callback){
+    var script = "SELECT L.id, L.name " +
+                 "FROM DREAMS D " +
+                 "INNER JOIN LOCATIONs L ON D.location = L.id " +
+                 "WHERE D.dreamer = :1;";
+
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script,
+                               [user],
+                                function(err, results) {
+                                    if (err) { callback(null, "Error getting dreams: " + err); }
+                                    else { callback({media: results}, null); }
+                                    connection.close();
+                                    console.log("Connection closed.")
+                                });
+        }
+    });  
 }
 
 var database = {
