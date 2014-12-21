@@ -1,17 +1,46 @@
-<h1>Pending Requests</h1>
-<div>
-    <h4>Trip Invites</h4>
-    <li ng-repeat="t in trips">
-        <a href="/trip/{{t.ID}}">{{ t.NAME }}</a>
-        <button class="btn" ng-click="confirmInvite(t.ID)">Confirm</button>
-        <button class="btn" ng-click="rejectInvite(t.ID)">Reject</button>
-    </li>
+<div class="col-lg-12">
+    <h1>Pending Requests</h1>
 </div>
-<div >
-    <h4>Friend Requests</h4>
-    <li ng-repeat="f in friends">
-        <a href="/homepage/{{f.LOGIN}}">{{ f.NAME }}</a>
-        <button class="btn" ng-click="confirmRequest(f.ID)">Confirm</button>
-        <button class="btn" ng-click="rejectRequest(f.ID)">Reject</button>
-    </li>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Trip Invites</h4>
+    </div>
+    <!-- /.panel-heading -->
+    <div class="panel-body">
+        <div class="list-group">
+            <div ng-repeat="t in trips" class="list-group-item">
+                <a href="/trip/{{t.ID}}"><span>{{ t.NAME }}</span></a>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-primary btn-xs" ng-click="confirmInvite(t)">Confirm</button>
+                    <button class="btn btn-primary btn-xs" ng-click="rejectInvite(t)">Reject</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.list-group -->
+        <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->
+    </div>
+    <!-- /.panel-body -->
 </div>
+<!-- /.panel -->
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Friend Requests</h4>
+    </div>
+    <!-- /.panel-heading -->
+    <div class="panel-body">
+        <div class="list-group">
+            <div ng-repeat="f in friends" class="list-group-item">
+                <a href="/homepage/{{f.LOGIN}}"><span>{{ f.NAME }}</span></a>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-primary btn-xs" ng-click="confirmRequest(f)">Confirm</button>
+                    <button class="btn btn-primary btn-xs" ng-click="rejectRequest(f)">Reject</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.list-group -->
+        <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->
+    </div>
+    <!-- /.panel-body -->
+</div>
+<!-- /.panel -->

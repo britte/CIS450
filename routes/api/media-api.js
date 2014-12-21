@@ -100,7 +100,7 @@ var post_media = function(req, res){
         if (err) {
             res.status(500).send({ msg : "Error adding media to album: " + err });
         } else {
-            res.send(200);
+            res.sendStatus(200);
         }
     })
 }
@@ -114,7 +114,7 @@ var post_media_rating = function(req, res){
         if(err) {
             res.status(500).send({ msg : "Error rating media: " + err });
         } else {
-            res.send(200)
+            res.sendStatus(200)
         }
     });
 }
@@ -128,7 +128,7 @@ var post_media_comment = function(req, res){
         if(err) {
             res.status(500).send({ msg : "Error commenting media: " + err });
         } else {
-            res.send(200)
+            res.sendStatus(200)
         }
     });
 }
@@ -137,9 +137,10 @@ var api = {
     post_album: post_album,
     get_album: get_album,
     get_albums: get_albums,
+    get_media: get_media,
     post_media: post_media,
     post_media_rating: post_media_rating,
-    post_media_comment: post_media_comment,
+    post_media_comment: post_media_comment
 };
 
 module.exports = api;

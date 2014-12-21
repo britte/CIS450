@@ -78,6 +78,7 @@ var get_trips = function(req, res) {
         if (err) {
             res.status(500).send({ msg: "Error finding trips: " + err });
         } else {
+            console.log('sending json')
             res.json(trips);
         }
     })
@@ -117,7 +118,7 @@ var post_trip_invite = function(req, res) {
         if(err){
             res.status(500).send({ msg: "Error inviting friend: " + err });
         } else{
-            res.send(200);
+            res.sendStatus(200);
         }
     });
 }
@@ -129,7 +130,7 @@ var reject_trip_invite = function(req, res) {
         if(err){
             res.status(500).send({ msg: "Error rejecting invite: " + err });
         } else{
-            res.send(200);
+            res.sendStatus(200);
         }
     });
 }
@@ -142,7 +143,7 @@ var confirm_trip_invite = function(req, res){
         if(err){
             res.status(500).send({ msg: "Error confirming invite request: " + err });
         } else {
-            res.send(200);
+            res.sendStatus(200);
         }
     });
 }

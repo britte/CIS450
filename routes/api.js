@@ -24,7 +24,7 @@ var get_login = function(req, res) {
 
 var get_logout = function(req, res) {
     req.session.user = null;
-    res.redirect('/');
+    res.redirect('/login');
 }
 
 var get_user = function(req, res) {
@@ -51,7 +51,7 @@ var post_user = function(req, res) {
             db.postUser(user, function(data, err){
                 if (data) {
                     req.session.user = user;
-                    res.status(200)
+                    res.status(200).send({ msg: 'success'})
                 } else {
                     res.status(500).send({ msg: err });
                 }
@@ -70,15 +70,14 @@ var put_user_update = function(req, res) {
         login = req.session.user ? req.session.user.LOGIN : res.redirect('/');
 
     db.updateUser(login, name, pwd, aff, function(data, err){
-        if (err){
-            console.log("Error updating user: " + err);
-            res.json({data: null, err: true, errMsg: 'Invalid data'})
+        if (err){;
+            res.status(500).send({msg: 'Invalid data'})
         } else {
             // Update session cookie
             req.session.user.AFFILIATION = aff;
             req.session.user.PWD = pwd;
             req.session.user.NAME = name;
-            res.redirect('/homepage/' + user.LOGIN);
+            res.status(200).send('success')
         }
     });
 }
@@ -148,15 +147,9 @@ var get_pending = function(req, res){
             console.log("Error getting pending: " + err);
             res.json({data: data, err: !!err, errMsg: err});
         } else {
-            console.log(data)
-//            res.render("pending.ejs", { user : user,
-//                                        friends : _.filter(data, function(f){ return f.TYP == 'friend' }),
-//                                        trip : _.filter(data, function(f){ return f.TYP == 'trip' })
-//                                      })
-            res.json({ user : user,
-                              friends : _.filter(data, function(f){ return f.TYP == 'friend' }),
-                              trip : _.filter(data, function(f){ return f.TYP == 'trip' })
-                          })
+            res.json({friends : _.filter(data, function(f){ return f.TYP == 'friend' }),
+                      trips : _.filter(data, function(f){ return f.TYP == 'trip' })
+                      })
 
         }
     });
@@ -172,12 +165,32 @@ var search = function(req, res){
    });
 }
 
+
+var get_trips = function(req, res) {
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID;
+    console.log('in api')
+    db.getUserTrips(uid, function(trips, err){
+        console.log('returned from getTrips')
+        if (err) {
+            console.log(err)
+            res.status(500).send({ msg: "Error finding trips: " + err });
+        } else {
+            console.log('sending json')
+            res.json(trips);
+        }
+    })
+}
+
 var api = {
     get_session: get_session,
     get_login: get_login,
+    get_logout: get_logout,
     get_user: get_user,
     post_user: post_user,
     put_user_update: put_user_update,
+
+    get_trips: get_trips,
 
     get_news_feed: get_news_feed,
     get_pending: get_pending,
