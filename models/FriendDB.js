@@ -60,6 +60,8 @@ var dbGetFriendTrips = function(uid, callback) {
                  "INNER JOIN friends uf ON uf.friend_1 = u.id " +
                  "INNER JOIN users f ON f.id = uf.friend_2 " +
                  "WHERE (uf.status = 1 AND u.id =:1)) ";
+    var tripsYouWentOn = "WITH TYWO AS (SELECT pt.trip FROM PARTICIPATE_TRIP " +
+                         ""
     var script2 = "SELECT t.ID FROM trips t" +
                  "INNER JOIN fr ON fr.id = t.owner";
     oracle.connect(connectData, function(err, connection){
@@ -141,7 +143,7 @@ var dbGetFriendRequests = function(uid, callback) {
 }
 
 var dbRecommendFriend = function(uid, callback){
-    var script1 = "WITH recs1 AS (" 
+    var script1 = "WITH recs1 AS (" +
                  "SELECT R.NAME, R.LOGIN, R.ID " +
                  "FROM USERS U " +
                  "INNER JOIN FRIENDS F ON U.id = F.FRIEND_1 " +
@@ -182,7 +184,7 @@ var dbRecommendFriend = function(uid, callback){
                   "SELECT * " +
                   "FROM peopleOnThoseTrips " +
                   "), recs2 AS (" +
-                  "SELECT U.name, U.login " +                  
+                  "SELECT U.name, U.login, U.ID " +                  
                   "FROM USERS U " +
                   "INNER JOIN peopleWhoWentAndArentFriends PWWAAF ON U.id = PWWAAF.id " +
                   ")";
@@ -198,7 +200,7 @@ var dbRecommendFriend = function(uid, callback){
                   "SELECT * " +
                   "FROM peopleNotFriendsWithUser PNFWU " +
                   "), recs3 AS ( " +
-                  "SELECT U.name, U.login " +
+                  "SELECT U.name, U.login, U.ID " +
                   "FROM USERS U " +
                   "INNER JOIN peopleSameAffNonFriend PSANF ON PSANF.id = U.id" +
                   ") ";
@@ -207,8 +209,11 @@ var dbRecommendFriend = function(uid, callback){
                  "SELECT * " +
                  "FROM recs1 " +
                  "UNION " +
-                 "SELECT *" +
-                 "FROM recs2";            
+                 "SELECT * " +
+                 "FROM recs2 " +
+                 "UNION " +
+                 "SELECT * " +
+                 "FROM recs3";            
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
@@ -229,7 +234,8 @@ var database = {
   confirmFriendRequest: dbConfirmFriendRequest,
   getFriendRequests: dbGetFriendRequests,
   rejectFriendRequest: dbRejectFriendRequest,
-  getFriendRecs: dbRecommendFriend
+  getFriendRecs: dbRecommendFriend,
+  getFriendTrips: dbGetFriendTrips
 };
 
 module.exports = database;
