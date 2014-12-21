@@ -156,7 +156,10 @@ var dbGetValidTrip = function(tname, callback) {
             console.log("Connected...");
             connection.execute(script, [tname], function(err, results) {
                 if (err) { callback( null, err); }
-                else { callback(results[0], null); }
+                else {
+                    if(results) {callback(results[0], null); }
+                    else {callback(null, null);}
+                }
                 connection.close();
                 console.log("Connection closed.")
             });
