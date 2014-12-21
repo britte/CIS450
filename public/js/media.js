@@ -51,6 +51,7 @@ tripApp.controller('AlbumCtrl', function($scope, $http, $routeParams, $location)
     $http.get('/api/album/'+$routeParams.id)
         .success(function(album) {
             $scope.album = album;
+            console.log(album)
             $scope.canEdit = album.OWNER == $scope.currentUser.ID;
         })
         .error(function(err) {
@@ -77,8 +78,8 @@ tripApp.controller('AlbumCtrl', function($scope, $http, $routeParams, $location)
 tripApp.controller('AlbumsCtrl', function($scope, $http, $routeParams, $location) {
     $http.get('/api/albums')
         .success(function(albums) {
-            $scope.albums = albums.user;
-            $scope.trip_albums = albums.trip;
+            $scope.u_albums = albums.user;
+            $scope.t_albums = albums.trip;
         })
         .error(function(err) {
             $scope.err = true;

@@ -1,7 +1,16 @@
-<h1>{{ album.NAME }}</h1>
-    <div ng-show="album.OWNER == currentUser.ID">
-        <button class="btn" onclick="location.href = '/album-edit/{{album.ID}}';"> Edit Info </button>
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            {{album.NAME}}
+            <button ng-show="album.OWNER == currentUser.ID"
+                    class="btn"
+                    ng-click="location.href = '/album-edit/{{album.ID}}';">
+                Edit Info
+            </button>
+        </h1>
     </div>
+</div>
+
 <form ng-submit="addMedia()">
     URL: <input type="text" ng-model="url">
     </br>

@@ -36,7 +36,7 @@ var post_album = function(req, res){
 
 var get_album = function(req, res) {
     var user = req.session.user || res.redirect('/'),
-        aid = req.params.album;
+        aid = req.params.id;
     db.getAlbum(aid, function(album, err){
         if (err) {
             res.status(500).send({msg: "Error getting album: " + err });
