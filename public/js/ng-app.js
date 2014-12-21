@@ -228,9 +228,9 @@ tripApp.controller('FriendsCtrl', function($scope, $http, $routeParams) {
 });
 
 tripApp.controller('SearchCtrl', function($scope, $http, $routeParams) {
-    $http.get('/api/search/'+$routeParams.query)
+    $http.post('/api/search/', {query: $routeParams.query})
         .success(function(results) {
-            console.log(results)
+            $scope.results = results;
         })
         .error(function(err) {
             $scope.err = true;

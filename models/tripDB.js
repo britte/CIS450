@@ -168,7 +168,6 @@ var dbGetValidTrip = function(tname, callback) {
 }
 
 var dbGetUserTrips = function(uid, callback) {
-    console.log('in DB')
     var script = "SELECT t.id, t.name, t.owner, pt.status " +
                  "FROM participate_trip pt " +
                  "INNER JOIN users u ON pt.invitee = u.id " +

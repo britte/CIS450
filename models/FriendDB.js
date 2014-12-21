@@ -56,12 +56,12 @@ var dbGetFriends = function(uid, callback) {
 }
 
 var dbGetFriendTrips = function(uid, callback) {
-    var script1 = "WITH fr AS (SELECT f.id FROM users u " +
+    var script1 = "WITH fr AS (SELECT f.id FROM users u ) " +
                  "INNER JOIN friends uf ON uf.friend_1 = u.id " +
                  "INNER JOIN users f ON f.id = uf.friend_2 " +
                  "WHERE (uf.status = 1 AND u.id =:1)) ";
     var tripsYouWentOn = "(SELECT pt.trip FROM PARTICIPATE_TRIP pt " +
-                         "INNER JOIN users u ON u.id = pt.invitee AND u.id = :1";
+                         "INNER JOIN users u ON u.id = pt.invitee AND u.id = :1)";
     var script2 = "SELECT t.ID FROM trips t " +
                  "INNER JOIN fr ON fr.id = t.owner " +
                  "UNION " +

@@ -211,13 +211,12 @@ var dbRecommendLocation = function(user, callback){
 }
 
 var dbSearch = function(searchTerm, callback){
-    console.log(searchTerm)
    var user_script = "SELECT U.id, U.name, 'user' as typ " +
                      "FROM USERS U " +
-                     "WHERE lower(U.name) LIKE '%:1%'";
+                     "WHERE lower(U.name) LIKE :1";
    var location_script = "SELECT L.id, L.name, 'loc' as typ " +
                          "FROM LOCATIONS L " +
-                         "WHERE lower(L.name) LIKE '%:1%'";
+                         "WHERE lower(L.name) LIKE :1";
 
    var script = "WITH usersres AS (" + user_script + "), " +
                 "locres AS (" + location_script + ") " +
@@ -229,8 +228,48 @@ var dbSearch = function(searchTerm, callback){
        if (err) { console.log("Error connecting to db:" + err); }
        else {
            console.log("Connected...");
-           var term = searchTerm.toString().toLowerCase();
+           var term = '%'+searchTerm.toString().toLowerCase()+'%';
            console.log(script)
+           connection.execute(script, [term], function(err, results) {
+               if (err) { callback(null, "Error user search results: " + err); }
+               else { callback(results, null); }
+               connection.close();
+               console.log("Connection closed.")
+           });
+       }
+   });
+}
+
+var dbLocationSearch = function(searchTerm, callback){
+   var script = "SELECT L.id, L.name " +
+                 "FROM LOCATIONS L " +
+                 "WHERE lower(L.name) LIKE :1";
+   oracle.connect(connectData, function(err, connection){
+       if (err) { console.log("Error connecting to db:" + err); }
+       else {
+           console.log("Connected...");
+           var term = '%'+searchTerm.toString().toLowerCase()+'%';
+           console.log(term)
+           connection.execute(script, [term], function(err, results) {
+               if (err) { callback(null, "Error user search results: " + err); }
+               else { callback(results, null); }
+               connection.close();
+               console.log("Connection closed.")
+           });
+       }
+   });
+}
+
+var dbTripSearch = function(searchTerm, callback){
+   var script = "SELECT T.id, T.name " +
+                 "FROM Trip T " +
+                 "WHERE lower(T.name) LIKE :1";
+   oracle.connect(connectData, function(err, connection){
+       if (err) { console.log("Error connecting to db:" + err); }
+       else {
+           console.log("Connected...");
+           var term = '%'+searchTerm.toString().toLowerCase()+'%';
+           console.log(term)
            connection.execute(script, [term], function(err, results) {
                if (err) { callback(null, "Error user search results: " + err); }
                else { callback(results, null); }
@@ -317,7 +356,9 @@ var database = {
 
   getNewsFeed: dbGetNewsFeed,
   getAllPending: dbGetAllPending,
-  search: dbSearch
+  search: dbSearch,
+
+  locationSearch: dbLocationSearch
 };
 
 module.exports = database;

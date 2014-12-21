@@ -78,7 +78,6 @@ var get_trips = function(req, res) {
         if (err) {
             res.status(500).send({ msg: "Error finding trips: " + err });
         } else {
-            console.log('sending json')
             res.json(trips);
         }
     })

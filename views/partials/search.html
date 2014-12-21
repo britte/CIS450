@@ -12,14 +12,11 @@
     <!-- /.panel-heading -->
     <div class="panel-body">
         <div class="list-group">
-            <a ng-repeat="f in friends" href="/homepage/{{f.LOGIN}}" class="list-group-item">
-                <span>{{ f.NAME }}</span>
-                <span class="pull-right text-muted small"><em>{{ f.FRIEND_DATE }}</em>
-                </span>
+            <a ng-repeat="r in results" class="list-group-item">
+                <span>{{ r.NAME }}</span>
             </a>
         </div>
         <!-- /.list-group -->
-        <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->
     </div>
     <!-- /.panel-body -->
 </div>

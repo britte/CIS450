@@ -156,13 +156,34 @@ var get_pending = function(req, res){
 }
 
 var search = function(req, res){
-    console.log(query)
-    var query = req.params.query;
+    var query = req.body.query;
     db.search(query, function(data, err){
        if(err) {
            console.log("error during user/location search" + err);
        } else {
             console.log(data)
+            res.json(data);
+       }
+    });
+}
+
+var get_location_search = function(req, res){
+    var query = req.body.query;
+    db.locationSearch(query, function(data, err){
+       if(err) {
+           console.log("error during user/location search" + err);
+       } else {
+            res.json(data);
+       }
+    });
+}
+
+var get_trip_search = function(req, res){
+    var query = req.body.query;
+    db.locationSearch(query, function(data, err){
+       if(err) {
+           console.log("error during user/location search" + err);
+       } else {
             res.json(data);
        }
     });
@@ -178,7 +199,8 @@ var api = {
 
     get_news_feed: get_news_feed,
     get_pending: get_pending,
-    get_search: search
+    get_search: search,
+    get_location_search: get_location_search
 };
 
 module.exports = api;

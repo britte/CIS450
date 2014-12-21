@@ -76,12 +76,13 @@ var get_friend_trips = function(req, res){
    var user = req.session.user || res.redirect('/'),
        uid = user.ID;
 
+       console.log('in api')
+
    db.getFriendTrips(uid, function(data, err){
        if(err){
+            console.log(err)
            res.status(500).send({ msg : "Error getting friend trips: " + err});
        } else {
-            console.log('ft')
-            console.log(data)
            res.json(data)
        }
    });

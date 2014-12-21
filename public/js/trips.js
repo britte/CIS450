@@ -101,7 +101,6 @@ tripApp.controller('TripsCtrl', function($scope, $http, $routeParams, $location)
             $scope.err = true;
             $scope.errMsg = err.msg;
         });
-
     $http.get('/api/friend-trips')
         .success(function(trips) {
             console.log(trips)

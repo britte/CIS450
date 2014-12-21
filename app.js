@@ -40,7 +40,7 @@ app.get('/api/friend-recs', friend_api.get_friend_recs);
 app.post('/api/request-friend/:friend', friend_api.post_friend_request);
 app.post('/api/reject-request/:friend', friend_api.reject_friend_request);
 app.post('/api/confirm-request/:friend', friend_api.confirm_friend_request);
-app.post('/api/friend-trips', friend_api.get_friend_trips);
+app.get('/api/friend-trips', friend_api.get_friend_trips);
 
 // Trip API
 app.post('/api/post-trip', trip_api.post_trip);
@@ -63,7 +63,8 @@ app.post('/api/post-media-comment/:media', media_api.post_media_comment);
 
 //
 app.get('/api/pending', api.get_pending)
-app.get('/api/search/:query', api.get_search)
+app.post('/api/search', api.get_search)
+app.post('/api/search/location', api.get_location_search)
 app.get('/api/newsfeed/:login', api.get_news_feed)
 
 // Page fetch routes (load data after html load)
