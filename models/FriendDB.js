@@ -187,7 +187,7 @@ var dbRecommendFriend = function(uid, callback){
                  "UNION " +
                  "SELECT *" +
                  "FROM recs2;";
-                 
+
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
@@ -207,8 +207,8 @@ var database = {
   getFriends: dbGetFriends,
   confirmFriendRequest: dbConfirmFriendRequest,
   getFriendRequests: dbGetFriendRequests,
-  rejectFriendRequest: dbRejectFriendRequest
-  getFriendRecs: dbRecommendFriend,
+  rejectFriendRequest: dbRejectFriendRequest,
+  getFriendRecs: dbRecommendFriend
 };
 
 module.exports = database;
