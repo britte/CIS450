@@ -156,30 +156,16 @@ var get_pending = function(req, res){
 }
 
 var search = function(req, res){
-   db.search(req.body.searchTerm, function(data, err){
+    console.log(query)
+    var query = req.params.query;
+    db.search(query, function(data, err){
        if(err) {
-           console.log("error during user/location search");
+           console.log("error during user/location search" + err);
        } else {
-           res.json({data: data, err: !!err, errMsg: err});
+            console.log(data)
+            res.json(data);
        }
-   });
-}
-
-
-var get_trips = function(req, res) {
-    var user = req.session.user || res.redirect('/'),
-        uid = user.ID;
-    console.log('in api')
-    db.getUserTrips(uid, function(trips, err){
-        console.log('returned from getTrips')
-        if (err) {
-            console.log(err)
-            res.status(500).send({ msg: "Error finding trips: " + err });
-        } else {
-            console.log('sending json')
-            res.json(trips);
-        }
-    })
+    });
 }
 
 var api = {
@@ -190,11 +176,9 @@ var api = {
     post_user: post_user,
     put_user_update: put_user_update,
 
-    get_trips: get_trips,
-
     get_news_feed: get_news_feed,
     get_pending: get_pending,
-//    get_search: search
+    get_search: search
 };
 
 module.exports = api;
