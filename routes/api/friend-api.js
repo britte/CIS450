@@ -86,7 +86,7 @@ var get_outstanding_requests = function(req, res) {
 
 var api = {
     get_friends: get_friends,
-    get_friend-recs: get_friend-recs,
+    get_friend_recs: get_friend_recs,
     post_friend_request: post_friend_request,
     confirm_friend_request: confirm_friend_request,
     reject_friend_request: reject_friend_request,
