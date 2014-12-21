@@ -5,57 +5,51 @@ var _ = require('underscore');
 //                TRIP API
 // ************************************************ //
 
-var post_trip = function(req, res){
-    var user = req.session.user || res.redirect('/'),
-        uid = user.ID,
-        name = req.body.name,
-        location = req.body.location;
+var get_valid_location = function(req, res) {
+    var location = req.body.location;
     db.getValidLocation(location, function(loc, err){
         console.log(loc)
         if(err){
             console.log("Error finding location: " + err);
             res.json({data: null, err: !!err, errMsg: err});
-        } else if (!loc) {
-            db.postLocation(location, function(locId, err){
-                if(err){
-                    console.log("Error creating a location: " + err);
-                    res.json({data: null, err: !!err, errMsg: err});
-                } else {
-                    db.postTrip(uid, name, locId, function(tripId, err){
-                        if(err){
-                            console.log("Error creating a trip: " + err);
-                            res.json({data: null, err: !!err, errMsg: err});
-                        } else {
-                            db.postTripTo(tripId, locId, function(data, err){
-                                if(err){
-                                    console.log("Error creating a trip: " + err);
-                                    res.json({data: null, err: !!err, errMsg: err});
-                                } else {
-                                    res.redirect('/trip/'+tripId);
-                                }
-                            });
-                        }
-                    });
-                }
-            })
         } else {
-            db.postTrip(uid, name, loc.ID, function(tripId, err){
+            res.json({data: loc})
+        }
+    });
+}
+
+var post_location = function(req, res) {
+    var location = req.body.location;
+    db.postLocation(location, function(locId, err){
+        if(err){
+            console.log("Error creating a location: " + err);
+            res.json({data: null, err: !!err, errMsg: err});
+        } else {
+            res.json({data: location});
+        }
+    });
+}
+
+var post_trip = function(req, res){
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID,
+        name = req.body.name,
+        location = req.body.location;
+    db.postTrip(uid, name, loc.ID, function(tripId, err){
+        if(err){
+            console.log("Error creating a trip: " + err);
+            res.json({data: null, err: !!err, errMsg: err});
+        } else {
+            db.postTripTo(tripId, loc.ID, function(data, err){
                 if(err){
                     console.log("Error creating a trip: " + err);
                     res.json({data: null, err: !!err, errMsg: err});
                 } else {
-                    db.postTripTo(tripId, loc.ID, function(data, err){
-                        if(err){
-                            console.log("Error creating a trip: " + err);
-                            res.json({data: null, err: !!err, errMsg: err});
-                        } else {
-                            res.redirect('/trip/'+tripId);
-                        }
-                    });
+                    res.redirect('/trip/'+tripId);
                 }
             });
         }
-    })
+    });
 }
 
 var post_trip_update = function(req, res) {
@@ -161,6 +155,8 @@ var get_outstanding_invites = function(req, res) {
 
 
 var api = {
+    post_location: post_location,
+    get_valid_location: get_valid_location,
     post_trip: post_trip,
     post_trip_update: post_trip_update,
     get_trip: get_trip,
