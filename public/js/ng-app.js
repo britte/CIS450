@@ -25,7 +25,10 @@ tripApp.controller('MainCtrl', function($scope, $http){
                 $scope.errMsg = err.msg;
             })
     }
-
+    $scope.search = {}
+    $scope.sidebarSearch = function() {
+        window.location = '/search/'+$scope.search.query;
+    }
 })
 
 tripApp.controller('LoginCtrl', function($scope, $http, $location) {
