@@ -18,6 +18,11 @@ var get_login = function(req, res) {
     })
 }
 
+var get_logout = function(req, res) {
+    req.session.user = null;
+    res.redirect('/');
+}
+
 // Create a new user account
 var post_user = function(req, res) {
     var user = req.body;
@@ -115,7 +120,7 @@ var post_update_friend_request = function(req, res){
             if(err){
                 console.log("Error updating friend request: " + err);
             } else {
-                res.redirect("/friendrequests");
+                res.redirect("/pending");
             }
         });
     } else {
@@ -123,7 +128,7 @@ var post_update_friend_request = function(req, res){
             if(err){
                 console.log("Error updating friend request: " + err);
             } else {
-                res.redirect("/friendrequests");
+                res.redirect("/pending");
             }
         });
     }
@@ -433,6 +438,25 @@ var update_cache = function(req, res){
     });
 }
 
+var get_pending = function(req, res){
+    var user = req.session.user || res.redirect('/'),
+        uid = user.ID;
+    db.getAllPending(uid, false, function(data, err){
+        if(err) {
+            console.log("Error getting pending: " + err);
+            res.json({data: data, err: !!err, errMsg: err});
+        } else {
+            console.log(data)
+            res.render("pending.ejs", { user : user,
+                                        friends : _.filter(data, function(f){ return f.TYP == 'friend' }),
+                                        trip : _.filter(data, function(f){ return f.TYP == 'trip' })
+                                      })
+
+        }
+    });
+}
+
+
 //var recommend_location = function(req, res){
 //    db.recommendLocation(req.body.user, function(data, err){
 //        if(err){
@@ -477,7 +501,9 @@ var api = {
     post_media: post_media,
     post_media_rating: post_media_rating,
     post_media_comment: post_media_comment,
-    get_news_feed: get_news_feed
+    get_news_feed: get_news_feed,
+    get_pending: get_pending,
+    get_search: search
 };
 
 module.exports = api;
