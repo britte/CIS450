@@ -300,10 +300,10 @@ var dbPostDream = function(uid, lid, rank, callback){
 }
 
 var dbGetDreams = function(uid, callback){
-    var script = "SELECT L.id, L.name" +
-                 "FROM DREAMS D" +
-                 "INNER JOIN Locations L ON L.id = D.Location" +
-                 "WHERE D.Dreamer = :1;"
+    var script = "SELECT L.id, L.name " +
+                 "FROM DREAMS D " +
+                 "INNER JOIN Locations L ON L.id = D.Location " +
+                 "WHERE D.Dreamer = :1"
 
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }

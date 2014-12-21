@@ -132,14 +132,14 @@ var dbGetNewsFeed = function(login, callback){
                                                "AND f2.status = 1 " +
                         "INNER JOIN users uf1 ON uf1.id = f2.friend_1 " +
                         "INNER JOIN users uf2 ON uf2.id = f2.friend_2 " +
-                        "WHERE U.login = :1"
+                        "WHERE U.login = :1 "
     var media_script = "SELECT fu.name as f_name, fu.id as f_id, fu.login as f_login, " +
                                "a.id as id, a.name as name, a.creation_date as ts, null as misc, 'album' as typ " +
                         "FROM Users U " +
                         "INNER JOIN Friends F ON (U.ID = F.Friend_1 AND status = 1) " +
                         "INNER JOIN Users fu ON f.friend_2 = fu.id " +
                         "INNER JOIN Albums a on a.owner = f.friend_2 " +
-                        "WHERE U.login = :1";
+                        "WHERE U.login = :1 ";
     var trips_script = "SELECT fu.name as f_name, fu.id as f_id, fu.login as f_login, " +
                               "t.id as id, t.name as name, t.creation_date as ts, l.name as misc, 'trip' as typ " +
                        "FROM Users U " +
@@ -148,7 +148,7 @@ var dbGetNewsFeed = function(login, callback){
                        "INNER JOIN Trips t on t.owner = f.friend_2 " +
                        "INNER JOIN trip_to tt on t.id = tt.trip " +
                        "INNER JOIN locations l on tt.location = l.id " +
-                       "WHERE U.login = :1";
+                       "WHERE U.login = :1 ";
     var script = "WITH friend_news AS ("+friend_script+"), " +
                  "media_news AS ("+media_script+"), " +
                  "trips_news AS ("+trips_script+") " +
@@ -213,18 +213,18 @@ var dbRecommendLocation = function(user, callback){
 var dbSearch = function(searchTerm, callback){
     var user_script = "SELECT U.id, U.name, 'user' as typ " +
                      "FROM USERS U " +
-                     "WHERE lower(U.name) LIKE :1";
+                     "WHERE lower(U.name) LIKE :1 ";
     var location_script = "SELECT L.id, L.name, 'loc' as typ " +
                          "FROM LOCATIONS L " +
-                         "WHERE lower(L.name) LIKE :1";
+                         "WHERE lower(L.name) LIKE :1" ;
 
-    var trip_script = "SELECT T.id, T.name, 'trip' as typ" +
-                      "FROM TRIPS T" +
-                      "WHERE lower(T.name) LIKE :1";
+    var trip_script = "SELECT T.id, T.name, 'trip' as typ " +
+                      "FROM TRIPS T " +
+                      "WHERE lower(T.name) LIKE :1 ";
 
-    var media_script = "SELECT A.id, A.name, 'album' as typ" +
-                       "FROM ALBUMS A" +
-                       "WHERE lower(A.name) LIKE :1";
+    var media_script = "SELECT A.id, A.name, 'album' as typ " +
+                       "FROM ALBUMS A " +
+                       "WHERE lower(A.name) LIKE :1 ";
 
     var script = "WITH usersres AS (" + user_script + "), " +
                 "locres AS (" + location_script + "), " +
@@ -232,11 +232,11 @@ var dbSearch = function(searchTerm, callback){
                 "albumres AS (" + media_script + ") " +
                 "SELECT * FROM usersres " +
                 "UNION " +
-                "SELECT * FROM locres" +
-                "UNION" + 
-                "SELECT * FROM tripres" +
-                "UNION" +
-                "SELECT * FROM albumres";
+                "SELECT * FROM locres " +
+                "UNION " + 
+                "SELECT * FROM tripres " +
+                "UNION " +
+                "SELECT * FROM albumres ";
 
     oracle.connect(connectData, function(err, connection){
        if (err) { console.log("Error connecting to db:" + err); }
@@ -257,7 +257,7 @@ var dbSearch = function(searchTerm, callback){
 var dbLocationSearch = function(searchTerm, callback){
    var script = "SELECT L.id, L.name " +
                  "FROM LOCATIONS L " +
-                 "WHERE lower(L.name) LIKE :1";
+                 "WHERE lower(L.name) LIKE :1 ";
    oracle.connect(connectData, function(err, connection){
        if (err) { console.log("Error connecting to db:" + err); }
        else {
@@ -277,7 +277,7 @@ var dbLocationSearch = function(searchTerm, callback){
 var dbTripSearch = function(searchTerm, callback){
    var script = "SELECT T.id, T.name " +
                  "FROM Trip T " +
-                 "WHERE lower(T.name) LIKE :1";
+                 "WHERE lower(T.name) LIKE :1 ";
    oracle.connect(connectData, function(err, connection){
        if (err) { console.log("Error connecting to db:" + err); }
        else {
