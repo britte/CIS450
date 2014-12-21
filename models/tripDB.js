@@ -51,7 +51,6 @@ var dbPostLocation = function(location, callback) {
 var dbPostTrip = function(uid, name, lid, callback){
     generateId("SELECT MAX(id) AS ID FROM trips", function(data, err){
         if (err) {
-            console.log('generator')
             callback(null, err)
         } else {
             var create_script = "INSERT INTO trips (id, owner, start_date, end_date, name) " +
@@ -166,6 +165,7 @@ var dbGetValidTrip = function(tname, callback) {
 }
 
 var dbGetUserTrips = function(uid, callback) {
+    console.log('in DB')
     var script = "SELECT t.id, t.name, t.owner, t.status " +
                  "FROM participate_trip pt " +
                  "INNER JOIN users u ON pt.invitee = u.id " +
@@ -176,6 +176,7 @@ var dbGetUserTrips = function(uid, callback) {
         else {
             console.log("Connected...");
             connection.execute(script, [uid], function(err, results) {
+                console.log(results)
                 if (err) { callback( null, err); }
                 else { callback(results, null); }
                 connection.close();
@@ -186,7 +187,7 @@ var dbGetUserTrips = function(uid, callback) {
 }
 
 var dbGetTripInvites = function(uid, confirmed, callback) {
-    var script = "SELECT t.name, t.id " +
+    var script = "SELECT t.name, t.id, pt.participate_date " +
                  "FROM participate_trip pt " +
                  "INNER JOIN trips t ON pt.trip = t.id " +
                  "INNER JOIN users u ON pt.invitee = u.id " +
@@ -207,7 +208,7 @@ var dbGetTripInvites = function(uid, confirmed, callback) {
 }
 
 var dbGetInvitedFriends = function(tid, callback) {
-    var script = "SELECT DISTINCT u.name, u.login, u.id, pt.status " +
+    var script = "SELECT DISTINCT u.name, u.login, u.id, pt.status, pt. " +
                  "FROM users u " +
                  "INNER JOIN participate_trip pt ON pt.invitee = u.id " +
                  "WHERE (pt.trip =:1)";
@@ -226,7 +227,7 @@ var dbGetInvitedFriends = function(tid, callback) {
 }
 
 var dbInviteTrip = function(uid, fid, tid, autoconfirm, callback){
-    var script = "INSERT INTO PARTICIPATE_TRIP (status, inviter, invitee, trip) " +
+    var script = "INSERT INTO PARTICIPATE_TRIP (status, inviter, invitee, trip, CURRENT_TIMESTAMP) " +
                  "VALUES (:1, :2, :3, :4)";
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }

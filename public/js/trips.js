@@ -94,6 +94,7 @@ tripApp.controller('TripCtrl', function($scope, $http, $routeParams, $location) 
 tripApp.controller('TripsCtrl', function($scope, $http, $routeParams, $location) {
     $http.get('/api/trips')
         .success(function(trips) {
+            console.log(trips)
             $scope.trips = trips;
         })
         .error(function(err) {

@@ -1,53 +1,167 @@
-<div ng-show="!!user">
-   <h1>{{ user.NAME }}</h1>
-    <form action='/api/search' method="post" id="searchForm">
-        <input name="searchTerm" type ="text">
-        <input class='btn' type="submit" value="search" onClick="doshit()">
-    </form>
-
-    <div id="result">
-
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">{{user.NAME}} <span class="h4 text-muted"><em>{{ user.AFFILIATION }}</em></span></h1>
     </div>
-    <div ng-show="private">
-        <form ng-click="requestFriend()" method="post">
-            <input class="btn" type="submit" value="Request Friend">
-        </form>
-        You are not friends with this user yet. Add them to see their profile.
-    </div>
-    <div ng-show="!private">
-        <p ng-show="user.AFFILIATION">Affiliation: {{ user.AFFILIATION }}</p>
-        <br/>
-        <div class="col-xs-12">
-            <button class="btn" onclick="location.href = '/user-edit';" ng-show="canEdit"> Edit Info </button>
-            <button class="btn" onclick="location.href = '/friends';"> Friends </button>
-            <button class="btn" onclick="location.href = '/albums';"> Albums </button>
-            <button class="btn" onclick="location.href = '/trips';"> Trips </button>
-            <button class="btn" onclick="location.href = '/pending';"> Pending Requests </button>
-        </div>
-    </div>
-
-    <div ng-show="!!news" class="col-xs-12">
-        <div ng-repeat="n in news">
-            <div ng-switch on="n.TYP">
-                <div ng-switch-when="friend">
-                    <li>
-                        <a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> and
-                        <a href="/homepage/{{n.MISC}}">{{n.NAME}}</a> just became friends!
-                    </li>
-                </div>
-                <div ng-switch-when="trip">
-                    <li>
-                        <a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> just created a new trip:
-                        <a href="/trip/{{n.ID}}">{{n.NAME}}</a>
-                    </li>
-                </div>
-                <div ng-switch-when="album">
-                    <li>
-                        <a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> just created a new album:
-                        <a href="/album/{{n.ID}}">{{n.NAME}}</a>
-                    </li>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-3 col-md-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-comments fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge">26</div>
+                        <div>New Comments!</div>
+                    </div>
                 </div>
             </div>
+            <a href="#">
+                <div class="panel-footer">
+                    <span class="pull-left">View Details</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="panel panel-green">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-tasks fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge">12</div>
+                        <div>New Tasks!</div>
+                    </div>
+                </div>
+            </div>
+            <a href="#">
+                <div class="panel-footer">
+                    <span class="pull-left">View Details</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="panel panel-yellow">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-shopping-cart fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge">124</div>
+                        <div>New Orders!</div>
+                    </div>
+                </div>
+            </div>
+            <a href="#">
+                <div class="panel-footer">
+                    <span class="pull-left">View Details</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="panel panel-red">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-support fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge">13</div>
+                        <div>Support Tickets!</div>
+                    </div>
+                </div>
+            </div>
+            <a href="#">
+                <div class="panel-footer">
+                    <span class="pull-left">View Details</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </a>
         </div>
     </div>
 </div>
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-clock-o fa-fw"></i> Recent News
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <ul ng-show="!!news" class="timeline" ng-repeat="n in news" ng-switch="n.TYP">
+                    <li ng-switch-when="trip" ng-class-odd="timeline-inverted">
+                        <div class="timeline-badge"><i class="fa fa-send"></i>
+                        </div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">New Trip</h4>
+                                <p><small class="text-muted"><i class="fa fa-clock-o"></i> 11 hours ago via Twitter</small>
+                                </p>
+                            </div>
+                            <div class="timeline-body">
+                                <p>
+                                    <a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> just created a new trip:
+                                    <a href="/trip/{{n.ID}}">{{n.NAME}}</a>
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li ng-switch-when="friend">
+                        <div class="timeline-badge"><i class="fa fa-gittip"></i>
+                        </div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">New Friendship</h4>
+                                <p><small class="text-muted"><i class="fa fa-clock-o"></i> 11 hours ago via Twitter</small>
+                                </p>
+                            </div>
+                            <div class="timeline-body">
+                                <p><a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> and
+                                    <a href="/homepage/{{n.MISC}}">{{n.NAME}}</a> just became friends!</p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li ng-switch-when="album">
+                        <div class="timeline-badge"><i class="fa fa-camera"></i>
+                        </div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <h4 class="timeline-title">New Album</h4>
+                                <p><small class="text-muted"><i class="fa fa-clock-o"></i> 11 hours ago via Twitter</small>
+                                </p>
+                            </div>
+                            <div class="timeline-body">
+                                <p>
+                                    <a href="/homepage/{{n.F_LOGIN}}">{{n.F_NAME}}</a> just created a new album:
+                                    <a href="/album/{{n.ID}}">{{n.NAME}}</a>
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-8 -->
+</div>
+<!-- /.row -->

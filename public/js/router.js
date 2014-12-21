@@ -26,42 +26,42 @@ tripApp.config(['$routeProvider', '$locationProvider',
                 controller: 'UserEditCtrl'
             }).
             when('/add-trip', {
-                templateUrl: '/partials/trip/add-trip.html',
+                templateUrl: '/partials/add-trip.html',
                 controller: 'AddTripCtrl'
             }).
             when('/trip-edit/:trip', {
-                templateUrl: '/partials/trip/edit-trip.html',
+                templateUrl: '/partials/edit-trip.html',
                 controller: 'EditTripCtrl'
             }).
             when('/trip/:id', {
-                templateUrl: '/partials/trip/trip.html',
+                templateUrl: '/partials/trip.html',
                 controller: 'TripCtrl'
             }).
             when('/trips', {
-                templateUrl: '/partials/trip/trips.html',
+                templateUrl: '/partials/trips.html',
                 controller: 'TripsCtrl'
             }).
             when('/add-album', {
-                templateUrl: '/partials/media/add-album.html',
+                templateUrl: '/partials/add-album.html',
                 controller: 'AddAlbumCtrl'
             }).
             when('/album-edit/:album', {
-                templateUrl: '/partials/media/edit-album.html',
+                templateUrl: '/partials/edit-album.html',
                 controller: 'EditAlbumCtrl'
             }).
             when('/album/:id', {
-                templateUrl: '/partials/media/album.html',
+                templateUrl: '/partials/album.html',
                 controller: 'AlbumCtrl'
             }).
             when('/albums', {
-                templateUrl: '/partials/media/albums.html',
+                templateUrl: '/partials/albums.html',
                 controller: 'AlbumsCtrl'
             }).
             when('/media/:id', {
-                templateUrl: '/partials/media/media.html',
+                templateUrl: '/partials/media.html',
                 controller: 'MediaCtrl'
-            })
-            when('/friend', {
+            }).
+            when('/friends', {
                 templateUrl: '/partials/friends.html',
                 controller: 'FriendsCtrl'
             }).

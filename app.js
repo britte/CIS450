@@ -30,11 +30,13 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.get('/api/session', api.get_session);
 app.post('/api/signup', api.post_user);
 app.get('/api/login/:login/:pwd', api.get_login);
+app.get('/api/logout', api.get_logout);
 app.get('/api/user/:login', api.get_user);
 app.post('/api/user-edit', api.put_user_update);
 
 // Friend API
 app.get('/api/friends', friend_api.get_friends);
+app.get('/api/friend-recs', friend_api.get_friend_recs);
 app.post('/api/request-friend/:friend', friend_api.post_friend_request);
 app.post('/api/reject-request/:friend', friend_api.reject_friend_request);
 app.post('/api/confirm-request/:friend', friend_api.confirm_friend_request);
@@ -65,6 +67,8 @@ app.get('/api/newsfeed/:login', api.get_news_feed)
 //app.post('/api/search', api.get_search);
 
 // Page fetch routes (load data after html load)
+app.get('/login', routes.login)
+app.get('/signup', routes.signup)
 app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
 app.get('*', routes.index);

@@ -111,7 +111,7 @@ var dbUpdateUser = function(login, name, pwd, aff, callback){
             console.log("Error connecting to db: " + err);
         } else {
             console.log("Connected...");
-                connection.execute(script, [name, aff, pwd, uid],
+                connection.execute(script, [name, aff, pwd, login],
                     function(err2, results){
                         if(err2) { callback(null, err2); }
                         else { callback(true, null);}
@@ -272,13 +272,13 @@ var dbUpdateCachedMedia = function(callback){
 
 var dbGetAllPending = function(uid, confirmed, callback) {
 
-    var invites_script = "SELECT t.name, t.id, null as login, 'trip' as typ " +
+    var invites_script = "SELECT t.name, t.id, null as login, pt.participate_date as ts, 'trip' as typ " +
                          "FROM participate_trip pt " +
                          "INNER JOIN trips t ON pt.trip = t.id " +
                          "INNER JOIN users u ON pt.invitee = u.id " +
                          "WHERE (pt.status =:1 AND u.id =:2)";
 
-    var requests_script = "SELECT f.name, f.id, f.login, 'friend' as typ " +
+    var requests_script = "SELECT f.name, f.id, f.login, uf.friend_date as ts, 'friend' as typ " +
                           "FROM users u " +
                           "INNER JOIN friends uf ON uf.friend_2 = u.id " +
                           "INNER JOIN users f ON f.id = uf.friend_1 " +

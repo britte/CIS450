@@ -1,8 +1,0 @@
-<div ng-show="!!trips">
-    <h2>Your Trips</h2>
-    <li ng-repeat="t in trips">
-        <a href="/trip/{{t.ID}}">
-            {{ t.NAME }} {{ t.STATUS == 2 ? '(owner)' : '' }}
-        </a>
-    </li>
-</div>

@@ -1,10 +1,30 @@
 var tripApp = angular.module('trip', ['ngRoute'])
 
 tripApp.controller('MainCtrl', function($scope, $http){
-    $http.get('/api/session').success(function(s){
-        console.log(s.user)
-        $scope.currentUser = s.user
-    })
+    $http.get('/api/session')
+        .success(function(s){
+            $scope.currentUser = s.user
+        })
+
+    $http.get('/api/pending')
+        .success(function(pending){
+            $scope.pending = _.union(pending.friends, pending.trips);
+            $scope.numPending = $scope.pending.length;
+            console.log(pending)
+            console.log($scope.pending)
+        })
+
+    $scope.logout = function() {
+        $http.get('/api/logout')
+            .success(function(err){
+                window.location = '/login'
+            })
+            .error(function(err){
+                alert(err.msg)
+                $scope.err = true;
+                $scope.errMsg = err.msg;
+            })
+    }
 
 })
 
@@ -14,7 +34,7 @@ tripApp.controller('LoginCtrl', function($scope, $http, $location) {
             .success(function(user) {
                 console.log('Logged in ' + user.NAME)
                 $scope.currentUser = user;
-                $location.path('/homepage/' + user.LOGIN);
+                window.location = '/homepage/' + user.LOGIN;
             })
             .error(function(err){
                  $scope.err = true;
@@ -33,7 +53,8 @@ tripApp.controller('SignupCtrl', function($scope, $http, $location) {
         }
         $http.post('/api/signup/', user)
             .success(function(data) {
-                $location.path('/homepage/' + user.login);
+                console.log('Signed up ' + user.login)
+                window.location = '/homepage/' + user.login;
             })
             .error(function(err){
                  $scope.err = true;
@@ -67,18 +88,23 @@ tripApp.controller('HomeCtrl', function($scope, $http, $routeParams) {
 });
 
 tripApp.controller('UserEditCtrl', function($scope, $http, $location) {
+    $scope.user = {
+        name: $scope.currentUser.NAME,
+        affiliation: $scope.currentUser.AFFILIATION
+    }
     $scope.edit = function() {
-        if ($scope.old_pwd != $scope.currentUser.PWD) {
+        if ($scope.user.old_pwd != $scope.currentUser.PWD) {
             $scope.err = true;
-            $scope.errMsg = 'Incorrect password.';
+            $scope.errMsg = 'Current password not valid.';
             return
         }
 
         var update_pwd = function(){
-            if ($scope.new_pwd_1 || $scope.new_pwd_2) {
-                if ($scope.new_pwd_1 && $scope.new_pwd_2 &&
-                    $scope.new_pwd_1 == $scope.new_pwd_2) {
-                    return $scope.new_pwd
+            var user = $scope.user;
+            if (user.new_pwd_1 || user.new_pwd_2) {
+                if (user.new_pwd_1 && user.new_pwd_2 &&
+                    user.new_pwd_1 == user.new_pwd_2) {
+                    return user.new_pwd
                 } else {
                     return null
                 }
@@ -87,15 +113,12 @@ tripApp.controller('UserEditCtrl', function($scope, $http, $location) {
             }
         }
 
-        user = {
-            name: $scope.name,
-            affiliation: $scope.affiliation,
-            pwd: update_pwd()
-        }
-        if (user.pwd) {
-            $http.post('/api/user-edit', user)
+        $scope.user.pwd = update_pwd();
+
+        if ($scope.user.pwd) {
+            $http.post('/api/user-edit', $scope.user)
                 .success(function(data) {
-                    $location.path('/homepage/' + user.login);
+                    window.location = '/homepage/' + $scope.currentUser.LOGIN;
                 })
                 .error(function(err){
                      $scope.err = true;
@@ -111,7 +134,7 @@ tripApp.controller('UserEditCtrl', function($scope, $http, $location) {
 tripApp.controller('PendingCtrl', function($scope, $http, $routeParams) {
     $http.get('/api/pending')
         .success(function(pending) {
-            $scope.trips = pending.trip;
+            $scope.trips = pending.trips;
             $scope.friends = pending.friends;
             console.log(pending)
         })
@@ -120,9 +143,10 @@ tripApp.controller('PendingCtrl', function($scope, $http, $routeParams) {
             $scope.errMsg = err.msg;
         });
 
-    $scope.confirmInvite(tid) = function(){
-        $http.post('/api/confirm-invite/'+tid)
+    $scope.confirmInvite = function(t){
+        $http.post('/api/confirm-invite/'+t.ID)
             .success(function() {
+                $scope.trips = _.without($scope.trips, t)
                 console.log('Confirmed')
             })
             .error(function(err) {
@@ -131,9 +155,10 @@ tripApp.controller('PendingCtrl', function($scope, $http, $routeParams) {
             });
     }
 
-    $scope.rejectInvite(tid) = function(){
-        $http.post('/api/reject-invite/'+tid+'/'+currentUser.ID)
+    $scope.rejectInvite = function(t){
+        $http.post('/api/reject-invite/'+t.ID+'/'+currentUser.ID)
             .success(function() {
+                $scope.trips = _.without($scope.trips, t)
                 console.log('Confirmed')
             })
             .error(function(err) {
@@ -142,9 +167,10 @@ tripApp.controller('PendingCtrl', function($scope, $http, $routeParams) {
             });
     }
 
-    $scope.confirmRequest(fid) = function(){
-        $http.post('/api/confirm-request/'+fid)
+    $scope.confirmRequest = function(f){
+        $http.post('/api/confirm-request/'+f.ID)
             .success(function() {
+                $scope.friends = _.without($scope.friends, f)
                 console.log('Confirmed')
             })
             .error(function(err) {
@@ -153,9 +179,10 @@ tripApp.controller('PendingCtrl', function($scope, $http, $routeParams) {
             });
     }
 
-    $scope.rejectRequest(fid) = function(){
-        $http.post('/api/reject-request/'+fid)
+    $scope.rejectRequest = function(f){
+        $http.post('/api/reject-request/'+f.ID)
             .success(function() {
+                $scope.friends = _.without($scope.friends, f)
                 console.log('Confirmed')
             })
             .error(function(err) {
@@ -169,7 +196,6 @@ tripApp.controller('FriendsCtrl', function($scope, $http, $routeParams) {
     $http.get('/api/friends')
         .success(function(friends) {
             $scope.friends = friends;
-            console.log(pending)
         })
         .error(function(err) {
             $scope.err = true;
@@ -177,18 +203,20 @@ tripApp.controller('FriendsCtrl', function($scope, $http, $routeParams) {
         });
 
     $http.get('/api/friend-recs')
-        .success(function(friends) {
+        .success(function(recs) {
             $scope.recs = recs;
-            console.log(pending)
         })
         .error(function(err) {
             $scope.err = true;
             $scope.errMsg = err.msg;
         });
 
-    $scope.requestFriend(fid) = function(){
-        $http.post('/api/request-friend/'+fid)
+    $scope.requestFriend = function(f){
+        $http.post('/api/request-friend/'+f.ID)
             .success(function() {
+                f.FRIEND_DATE = 'Just a moment ago'
+                $scope.recs = _.without($scope.recs, f)
+                $scope.friends.push(f)
                 console.log('Confirmed')
             })
             .error(function(err) {

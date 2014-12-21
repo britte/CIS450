@@ -39,7 +39,7 @@ var post_friend_request = function(req, res) {
         if(err){
             res.status(500).send({ msg: "Error adding friend: " + err });
         } else{
-            res.send(200);
+            res.sendStatus(200);
         }
     });
 }
@@ -53,7 +53,7 @@ var confirm_friend_request = function(req, res){
         if(err){
             res.status(500).send({ msg : "Error confirming friend request: " + err});
         } else {
-            res.send(200)
+            res.sendStatus(200)
         }
     });
 }
@@ -67,30 +67,17 @@ var reject_friend_request = function(req, res){
         if(err){
             res.status(500).send({ msg : "Error rejecting friend request: " + err});
         } else {
-            res.send(200)
+            res.sendStatus(200)
         }
     });
 }
 
-var get_outstanding_requests = function(req, res) {
-    var user = req.session.user || res.redirect('/'),
-        uid = user.ID;
-    db.getFriendRequests(uid, function(data, err){
-        if (err) {
-            console.log("Error finding invites: " + err)
-        } else {
-            res.render('requests.ejs', {requests: data})
-        }
-    })
-}
-
 var api = {
     get_friends: get_friends,
-    get_friend-recs: get_friend-recs,
+    get_friend_recs: get_friend_recs,
     post_friend_request: post_friend_request,
     confirm_friend_request: confirm_friend_request,
-    reject_friend_request: reject_friend_request,
-//    get_outstanding_requests: get_outstanding_requests,
+    reject_friend_request: reject_friend_request
 };
 
 module.exports = api;

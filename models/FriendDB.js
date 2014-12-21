@@ -36,7 +36,8 @@ var dbAddFriend = function(uid, fid, callback){
 }
 
 var dbGetFriends = function(uid, callback) {
-    var script = "SELECT f.name, f.login, f.id FROM users u " +
+    var script = "SELECT f.name, f.login, f.id, uf.friend_date " +
+                 "FROM users u " +
                  "INNER JOIN friends uf ON uf.friend_1 = u.id " +
                  "INNER JOIN users f ON f.id = uf.friend_2 " +
                  "WHERE (uf.status = 1 AND u.id =:1)";
@@ -121,7 +122,7 @@ var dbRejectFriendRequest = function(uid, rid, callback){
 }
 
 var dbGetFriendRequests = function(uid, callback) {
-    var script = "SELECT f.name, f.login, f.id FROM users u " +
+    var script = "SELECT f.name, f.login, f.id, uf.friend_date FROM users u " +
                  "INNER JOIN friends uf ON uf.friend_2 = u.id " +
                  "INNER JOIN users f ON f.id = uf.friend_1 " +
                  "WHERE (uf.status = 0 AND u.id =:1)";
@@ -140,8 +141,8 @@ var dbGetFriendRequests = function(uid, callback) {
 }
 
 var dbRecommendFriend = function(uid, callback){
-    var script1 = "WITH recs1 AS (" +
-                 "SELECT R.NAME, R.LOGIN " +
+    var script1 = "WITH recs1 AS (" 
+                 "SELECT R.NAME, R.LOGIN, R.ID " +
                  "FROM USERS U " +
                  "INNER JOIN FRIENDS F ON U.id = F.FRIEND_1 " +
                  "INNER JOIN FRIENDS F2 ON F2.FRIEND_1 = F.FRIEND_2 " +
@@ -207,8 +208,7 @@ var dbRecommendFriend = function(uid, callback){
                  "FROM recs1 " +
                  "UNION " +
                  "SELECT *" +
-                 "FROM recs2";
-                 
+                 "FROM recs2";            
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
@@ -228,7 +228,7 @@ var database = {
   getFriends: dbGetFriends,
   confirmFriendRequest: dbConfirmFriendRequest,
   getFriendRequests: dbGetFriendRequests,
-  rejectFriendRequest: dbRejectFriendRequest
+  rejectFriendRequest: dbRejectFriendRequest,
   getFriendRecs: dbRecommendFriend,
 };
 

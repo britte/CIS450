@@ -1,0 +1,67 @@
+<div ng-show="!!trip">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">{{trip.NAME}}
+                <span class="h4 text-muted"><em>{{ trip.L_NAME}}</em></span>
+            </h1>
+        </div>
+    </div>
+    <div>
+        <button class="btn"
+                ng-click="location.href = '/trip-edit/{{trip.ID}}';"
+                ng-show="trip.OWNER == getUser().ID">
+            Edit Info
+        </button>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>Confirmed Attendees</h4>
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="list-group">
+                <div ng-repeat="f in confirmed" class="list-group-item">
+                    <a href="/homepage/{{f.LOGIN}}">
+                        <span>{{ f.NAME }}</span>
+                    </a>
+                    <button class="btn btn-primary btn-xs pull-right"
+                            ng-click="leaveTrip()"
+                            ng-show="currentUser.ID == f.ID">
+                        Leave Trip
+                    </button>
+                </div>
+            </div>
+            <!-- /.list-group -->
+            <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->
+        </div>
+        <!-- /.panel-body -->
+    </div>
+    <!-- /.panel -->
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>Invite Friends</h4>
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="list-group">
+                <div ng-repeat="f in invites" class="list-group-item">
+                    <a href="/homepage/{{f.LOGIN}}">
+                        <span>{{ f.NAME }}</span>
+                    </a>
+                    <button class="btn btn-primary btn-xs pull-right"
+                            ng-click="inviteFriend()">
+                        Invite Friend
+                    </button>
+                </div>
+            </div>
+            <!-- /.list-group -->
+            <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->
+        </div>
+        <!-- /.panel-body -->
+    </div>
+    <!-- /.panel -->
+
+
+</div>
