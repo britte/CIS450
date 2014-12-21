@@ -224,7 +224,7 @@ var dbSearch = function(searchTerm, callback){
 
     var media_script = "SELECT A.id, A.name, 'album' as typ " +
                        "FROM ALBUMS A " +
-                       "WHERE lower(A.name) LIKE :1 ";
+                       "WHERE lower(A.name) LIKE :1";
 
     var script = "WITH usersres AS (" + user_script + "), " +
                 "locres AS (" + location_script + "), " +
@@ -372,7 +372,8 @@ var database = {
   getAllPending: dbGetAllPending,
   search: dbSearch,
 
-  locationSearch: dbLocationSearch
+  locationSearch: dbLocationSearch,
+  tripSearch: dbTripSearch
 };
 
 module.exports = database;

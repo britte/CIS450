@@ -231,6 +231,7 @@ tripApp.controller('FriendsCtrl', function($scope, $http, $routeParams) {
 });
 
 tripApp.controller('SearchCtrl', function($scope, $http, $routeParams) {
+    $scope.query = $routeParams.query;
     $http.post('/api/search/', {query: $routeParams.query})
         .success(function(results) {
             $scope.results = results;

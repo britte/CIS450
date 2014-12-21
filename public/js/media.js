@@ -14,6 +14,18 @@ tripApp.controller('AddAlbumCtrl', function($scope, $http, $routeParams, $locati
                  $scope.errMsg = err.msg;
             })
     }
+    $scope.search = {}
+    $scope.searchTrips = function () {
+        $http.post('/api/search/trips', { query: $scope.search.query })
+            .success(function(results) {
+                console.log(results)
+                $scope.search.results = results;
+            })
+            .error(function(err){
+                 $scope.err = true;
+                 $scope.errMsg = err.msg;
+            })
+    }
 });
 
 tripApp.controller('EditAlbumCtrl', function($scope, $http, $routeParams, $location) {

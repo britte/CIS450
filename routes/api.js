@@ -180,7 +180,7 @@ var get_location_search = function(req, res){
 
 var get_trip_search = function(req, res){
     var query = req.body.query;
-    db.locationSearch(query, function(data, err){
+    db.tripSearch(query, function(data, err){
        if(err) {
            console.log("error during user/location search" + err);
        } else {
@@ -200,7 +200,8 @@ var api = {
     get_news_feed: get_news_feed,
     get_pending: get_pending,
     get_search: search,
-    get_location_search: get_location_search
+    get_location_search: get_location_search,
+    get_trip_search: get_trip_search
 };
 
 module.exports = api;

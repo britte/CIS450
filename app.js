@@ -67,6 +67,7 @@ app.post('/api/post-media-comment/:media', media_api.post_media_comment);
 app.get('/api/pending', api.get_pending)
 app.post('/api/search', api.get_search)
 app.post('/api/search/location', api.get_location_search)
+app.post('/api/search/trips', api.get_trip_search)
 app.get('/api/newsfeed/:login', api.get_news_feed)
 
 // Page fetch routes (load data after html load)

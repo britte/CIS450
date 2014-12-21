@@ -21,9 +21,23 @@
                                     <input class="form-control" type="text" maxlength="20" placeholder="Title" ng-model="album.name" autofocus>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" type="text" placeholder="Trip" ng-model="album.trip">
+                                    <input class="form-control" type="text" placeholder="Trip" ng-model="album.trip" disabled>
                                 </div>
                                 <button class="btn btn-lg btn-success btn-block">Create Album</button>
+                            </fieldset>
+                        </form>
+                        <form role="form" ng-submit="searchTrips()">
+                            <fieldset>
+                                <div class="form-group">
+                                    <input class="form-control" type="text" maxlength="20" placeholder="Title" ng-model="search.query">
+                                </div>
+                            </fieldset>
+                        </form>
+                        <form role="form">
+                            <fieldset>
+                                <div class="form-group">
+                                    <select ng-show="search.results" class="form-control" ng-options="r.NAME for r in search.results" ng-model="search.selected"></select>
+                                </div>
                             </fieldset>
                         </form>
                     </div>
