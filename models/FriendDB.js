@@ -211,7 +211,7 @@ var dbRecommendFriend = function(uid, callback){
                   ") ";
 
     var script = script1 + script2 + script3 +
-                 "SELECT * " +
+                 "SELECT DISTINCT * " +
                  "FROM recs1 " +
                  "UNION " +
                  "SELECT * " +

@@ -1,4 +1,5 @@
 var db = require('../../models/MediaDB.js');
+var tripdb = require('../../models/tripDB.js');
 var _ = require('underscore');
 
 // ************************************************ //
@@ -10,7 +11,7 @@ var post_album = function(req, res){
         uid = user.ID,
         tname = req.body.trip,
         name = req.body.name;
-    db.getValidTrip(tname, function(trip, err) {
+    tripdb.getValidTrip(tname, function(trip, err) {
         if (err) {
             console.log("Error creating album: " + err)
             res.json({data: trip, err: !!err, errMsg: err});
@@ -22,7 +23,8 @@ var post_album = function(req, res){
                         console.log("Error creating album: " + err)
                         res.json({data: data, err: !!err, errMsg: err});
                     } else {
-                        redirect("/albums", {});
+                        console.log(trip.ID)
+                        res.json({id: trip.ID})
                     }
                 })
             } else {
@@ -44,7 +46,7 @@ var get_album = function(req, res) {
             db.getAlbumMedia(aid, function(media, err){
                  if (err) {
                     console.log("Error getting media: " + err);
-                    res.json({data: data, err: !!err, errMsg: err});
+                       res.json({data: data, err: !!err, errMsg: err});
                  } else {
                       res.json({ album: album, media: media })
                  }

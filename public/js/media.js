@@ -1,23 +1,13 @@
 var tripApp = angular.module('trip')
 
 tripApp.controller('AddAlbumCtrl', function($scope, $http, $routeParams, $location) {
-    $http.get('/api/album/'+$routeParams.album)
-        .success(function(album) {
-            $scope.album = album;
-        })
-        .error(function(err) {
-            $scope.err = true;
-            $scope.errMsg = err.msg;
-        });
-
+    $scope.album = {}
     $scope.addAlbum = function() {
-        album = {
-            name: $scope.name,
-            trip: $scope.trip
-        }
-        $http.post('/api/post-album', album)
+        console.log($scope.album)
+        $http.post('/api/post-album', $scope.album)
             .success(function(album) {
-                $location.path('/album/' + album.ID);
+                console.log(album)
+                window.location = '/album/' + album.id;
             })
             .error(function(err){
                  $scope.err = true;
@@ -50,20 +40,18 @@ tripApp.controller('EditAlbumCtrl', function($scope, $http, $routeParams, $locat
 tripApp.controller('AlbumCtrl', function($scope, $http, $routeParams, $location) {
     $http.get('/api/album/'+$routeParams.id)
         .success(function(album) {
-            $scope.album = album;
             console.log(album)
+            $scope.album = album.album;
+            $scope.media = album.media;
             $scope.canEdit = album.OWNER == $scope.currentUser.ID;
         })
         .error(function(err) {
             $scope.err = true;
             $scope.errMsg = err.msg;
         });
+    $scope.media = {}
     $scope.addMedia = function(){
-        media = {
-            url: $scope.url,
-            video: !!$scope.video,
-            private: !!$scope.video
-        }
+        console.log($scope.media)
         $http.post('/api/post-media/'+$scope.album.ID, media)
             .success(function() {
                 console.log('Success')

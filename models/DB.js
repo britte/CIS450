@@ -211,6 +211,7 @@ var dbRecommendLocation = function(user, callback){
 }
 
 var dbSearch = function(searchTerm, callback){
+    console.log(searchTerm)
    var user_script = "SELECT U.id, U.name, 'user' as typ " +
                      "FROM USERS U " +
                      "WHERE lower(U.name) LIKE '%:1%'";
@@ -230,13 +231,12 @@ var dbSearch = function(searchTerm, callback){
            console.log("Connected...");
            var term = searchTerm.toString().toLowerCase();
            console.log(script)
-           connection.execute(script, [term],
-                               function(err, results) {
-                                   if (err) { callback(null, "Error user search results: " + err); }
-                                   else { callback({results: results}, null); }
-                                   connection.close();
-                                   console.log("Connection closed.")
-                               });
+           connection.execute(script, [term], function(err, results) {
+               if (err) { callback(null, "Error user search results: " + err); }
+               else { callback(results, null); }
+               connection.close();
+               console.log("Connection closed.")
+           });
        }
    });
 }

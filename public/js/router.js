@@ -68,5 +68,9 @@ tripApp.config(['$routeProvider', '$locationProvider',
             when('/pending', {
                 templateUrl: '/partials/pending.html',
                 controller: 'PendingCtrl'
+            }).
+            when('/search/:query', {
+                templateUrl: '/partials/search.html',
+                controller: 'SearchCtrl'
             });
     }]);

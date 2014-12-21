@@ -3,29 +3,51 @@
         <h1 class="page-header">
             {{album.NAME}}
             <button ng-show="album.OWNER == currentUser.ID"
-                    class="btn"
+                    class="btn btn-primary pull-right"
                     ng-click="location.href = '/album-edit/{{album.ID}}';">
                 Edit Info
             </button>
         </h1>
     </div>
 </div>
-
-<form ng-submit="addMedia()">
-    URL: <input type="text" ng-model="url">
-    </br>
-    </br>
-    Video: <input type="checkbox" ng-model="video">
-    </br>
-    </br>
-    Private: <input type="checkbox" ng-model="private">
-    </br>
-    </br>
-    <input type="hidden" ng-model="album" value="{{album.ID}}">
-    <input class="btn" type="submit" value="Add Media">
-</form>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Add Media
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <form role="form" ng-submit="addMedia()">
+                            <fieldset>
+                                <div class="form-group">
+                                    <input class="form-control" type="text" placeholder="URL" ng-model="media.url">
+                                </div>
+                                <div class="form-group">
+                                    <input type="checkbox" ng-model="media.video">
+                                </div>
+                                <div class="form-group">
+                                    <input type="checkbox" ng-model="media.checkbox">
+                                </div>
+                                <button class="btn btn-lg btn-success btn-block">Upload Media</button>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+                <!-- /.row (nested) -->
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
 <div>
     <div ng-repeat="m in media">
-        <a href="/media/{{m.ID}}"><img width="200" src="{{m.MEDIA_URL}}"></a>
+        <div class="col-xs-4">
+            <a href="/media/{{m.ID}}"><img style="width:100%" ng-src="{{m.MEDIA_URL}}"></a>
+        </div>
     </div>
 </div>

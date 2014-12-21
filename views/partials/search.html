@@ -1,22 +1,20 @@
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">Trips
-            <a class="btn btn-primary pull-right" href="/add-trip">
-                Add Trip
-            </a>
+        <h1 class="page-header">
+            Search Results
         </h1>
     </div>
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h4>Current Trips</h4>
+        <h4>Search Results for {{query.name}} </h4>
     </div>
     <!-- /.panel-heading -->
     <div class="panel-body">
         <div class="list-group">
-            <a ng-repeat="t in trips" href="/trip/{{t.ID}}" class="list-group-item">
-                <span>{{ t.NAME }}</span>
-                <span class="pull-right text-muted small"><em>{{ t.PARTICIPATE_DATE }}</em>
+            <a ng-repeat="f in friends" href="/homepage/{{f.LOGIN}}" class="list-group-item">
+                <span>{{ f.NAME }}</span>
+                <span class="pull-right text-muted small"><em>{{ f.FRIEND_DATE }}</em>
                 </span>
             </a>
         </div>

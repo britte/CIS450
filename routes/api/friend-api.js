@@ -72,12 +72,28 @@ var reject_friend_request = function(req, res){
     });
 }
 
+var get_friend_trips = function(req, res){
+   var user = req.session.user || res.redirect('/'),
+       uid = user.ID;
+
+   db.getFriendTrips(uid, function(data, err){
+       if(err){
+           res.status(500).send({ msg : "Error getting friend trips: " + err});
+       } else {
+            console.log('ft')
+            console.log(data)
+           res.json(data)
+       }
+   });
+}
+
 var api = {
     get_friends: get_friends,
     get_friend_recs: get_friend_recs,
     post_friend_request: post_friend_request,
     confirm_friend_request: confirm_friend_request,
-    reject_friend_request: reject_friend_request
+    reject_friend_request: reject_friend_request,
+    get_friend_trips: get_friend_trips,
 };
 
 module.exports = api;
