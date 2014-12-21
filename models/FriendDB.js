@@ -209,7 +209,7 @@ var database = {
   confirmFriendRequest: dbConfirmFriendRequest,
   getFriendRequests: dbGetFriendRequests,
   rejectFriendRequest: dbRejectFriendRequest,
-  getFriendRecs: dbRecommendFriend,
+  getFriendRecs: dbRecommendFriend
 };
 
 module.exports = database;

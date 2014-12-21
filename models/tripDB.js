@@ -166,7 +166,7 @@ var dbGetValidTrip = function(tname, callback) {
 
 var dbGetUserTrips = function(uid, callback) {
     console.log('in DB')
-    var script = "SELECT t.id, t.name, t.owner, t.status " +
+    var script = "SELECT t.id, t.name, t.owner, pt.status " +
                  "FROM participate_trip pt " +
                  "INNER JOIN users u ON pt.invitee = u.id " +
                  "INNER JOIN trips t ON pt.trip = t.id " +
@@ -208,7 +208,7 @@ var dbGetTripInvites = function(uid, confirmed, callback) {
 }
 
 var dbGetInvitedFriends = function(tid, callback) {
-    var script = "SELECT DISTINCT u.name, u.login, u.id, pt.status, pt. " +
+    var script = "SELECT DISTINCT u.name, u.login, u.id, pt.status, pt.participate_date " +
                  "FROM users u " +
                  "INNER JOIN participate_trip pt ON pt.invitee = u.id " +
                  "WHERE (pt.trip =:1)";

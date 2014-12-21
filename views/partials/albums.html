@@ -1,17 +1,52 @@
-<h1>Albums</h1>
-<a href="/add-album">Add New Album</a>
-<div id="user">
-    <h3>Your Albums</h3>
-        <li ng-repeat="a in albums">
-            <a href="/album/{{a.ID}}">{{ a.NAME }}</a>
-        </li>
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Albums</h1>
+    </div>
 </div>
-<div id="trip">
-    <h3>Albums For Your Trips</h3>
-    <li ng-repeat="a in trip-albums">
-        <a href="/album/{{a.ID}}">{{ a.NAME }}</a>
-        from <a href="/homepage/{{a.OLOGIN}}">{{a.ONAME}}'s</a>
-        trip <a href="/trip/{{a.TID}}">{{a.TNAME}}</a>
-        </a>
-    </li>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Your Albums
+            </div>
+            <!-- .panel-heading -->
+            <div class="panel-body">
+                <div class="list-group">
+                    <a ng-repeat="a in u_albums" href="/album/{{a.ID}}" class="list-group-item">
+                        <span>{{ a.NAME }}</span>
+                    </a>
+                </div>
+                <!-- /.list-group -->
+                <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->
+            </div>
+            <!-- .panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
 </div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Trip Albums
+            </div>
+            <!-- .panel-heading -->
+            <div class="panel-body">
+                <div class="list-group">
+                    <a ng-repeat="a in t_albums" href="/album/{{a.ID}}" class="list-group-item">
+                        <span>{{ a.NAME }}</span>
+                    </a>
+                </div>
+                <!-- /.list-group -->
+                <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->
+            </div>
+            <!-- .panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+
+
