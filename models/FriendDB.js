@@ -54,6 +54,27 @@ var dbGetFriends = function(uid, callback) {
     });
 }
 
+var dbGetFriendTrips = function(uid, callback) {
+    var script1 = "WITH fr AS (SELECT f.id FROM users u " +
+                 "INNER JOIN friends uf ON uf.friend_1 = u.id " +
+                 "INNER JOIN users f ON f.id = uf.friend_2 " +
+                 "WHERE (uf.status = 1 AND u.id =:1)) ";
+    var script2 = "SELECT t.ID FROM trips t" +
+                 "INNER JOIN fr ON fr.id = t.owner";
+    oracle.connect(connectData, function(err, connection){
+        if (err) { console.log("Error connecting to db:" + err); }
+        else {
+            console.log("Connected...");
+            connection.execute(script1 + script2, [uid], function(err, results) {
+                if (err) { callback( null, err); }
+                else { callback(results, null); }
+                connection.close();
+                console.log("Connection closed.")
+            });
+        }
+    });
+}
+
 var dbConfirmFriendRequest = function(uid, rid, callback){
     var add_script = "INSERT INTO friends " +
                      "(friend_date, friend_1, friend_2, status) " +
@@ -119,7 +140,7 @@ var dbGetFriendRequests = function(uid, callback) {
 }
 
 var dbRecommendFriend = function(uid, callback){
-    var script1 = "WITH recs1 AS (" 
+    var script1 = "WITH recs1 AS (" +
                  "SELECT R.NAME, R.LOGIN " +
                  "FROM USERS U " +
                  "INNER JOIN FRIENDS F ON U.id = F.FRIEND_1 " +
@@ -138,38 +159,38 @@ var dbRecommendFriend = function(uid, callback){
                   "FROM USERS U " +
                   "MINUS " +
                   "(" +
-                  "SELECT *" +
-                  "FROM peopleFriendsWithUser PFWU" +
+                  "SELECT * " +
+                  "FROM peopleFriendsWithUser PFWU " +
                   "UNION " +
-                  "SELECT U.id" +
-                  "FROM USERS U" +
+                  "SELECT U.id " +
+                  "FROM USERS U " +
                   "WHERE U.id = :1 " +
                   ")" +
                   "), tripsYouWentOn AS (" +
-                  "SELECT *" +
-                  "FROM TRIPS T" +
-                  "WHERE T.OWNER = :1" +
-                  "), peopleOnThoseTrips AS (" +
-                  "SELECT PT.INVITEE as id" +
-                  "FROM tripsYouWentOn TYWO " +
-                  "INNER JOIN PARTICIPATE_TRIP PT ON PT.TRIP = TYWO.ID" +
-                  "), peopleWhoWentAndArentFriends AS (" +
-                  "SELECT *" +
-                  "FROM peopleNotFriendsWithUser" +
-                  "INTERSECT" +
                   "SELECT * " +
-                  "FROM peopleOnThoseTrips" +
+                  "FROM TRIPS T " +
+                  "WHERE T.OWNER = :1 " +
+                  "), peopleOnThoseTrips AS (" +
+                  "SELECT PT.INVITEE as id " +
+                  "FROM tripsYouWentOn TYWO " +
+                  "INNER JOIN PARTICIPATE_TRIP PT ON PT.TRIP = TYWO.ID " +
+                  "), peopleWhoWentAndArentFriends AS (" +
+                  "SELECT * " +
+                  "FROM peopleNotFriendsWithUser " +
+                  "INTERSECT " +
+                  "SELECT * " +
+                  "FROM peopleOnThoseTrips " +
                   "), recs2 AS (" +
-                  "SELECT U.name, U.login" +                  
-                  "FROM USERS U" +
-                  "INNER JOIN peopleWhoWentAndArentFriends PWWAAF ON U.id = PWWAAF.id" +
+                  "SELECT U.name, U.login " +                  
+                  "FROM USERS U " +
+                  "INNER JOIN peopleWhoWentAndArentFriends PWWAAF ON U.id = PWWAAF.id " +
                   ")";
 
     var script3 = ", peopleWithSameAff AS ( " +
                   "SELECT R.id " +
                   "FROM USERS U, USERS R " +
-                  "WHERE U.id = 106 AND R.affiliation = U.affiliation  " +
-                  "), peopleSameAffNonFriend AS ( " +
+                  "WHERE U.id = 106 AND R.affiliation = U.affiliation " +
+                  "), peopleSameAffNonFriend AS (" +
                   "SELECT * " +
                   "FROM peopleWithSameAff PWSA " +
                   "INTERSECT " +
@@ -178,7 +199,7 @@ var dbRecommendFriend = function(uid, callback){
                   "), recs3 AS ( " +
                   "SELECT U.name, U.login " +
                   "FROM USERS U " +
-                  "INNER JOIN peopleSameAffNonFriend PSANF ON PSANF.id = U.id " +
+                  "INNER JOIN peopleSameAffNonFriend PSANF ON PSANF.id = U.id" +
                   ") ";
 
     var script = script1 + script2 + script3 +
@@ -186,7 +207,7 @@ var dbRecommendFriend = function(uid, callback){
                  "FROM recs1 " +
                  "UNION " +
                  "SELECT *" +
-                 "FROM recs2;";
+                 "FROM recs2";
                  
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
