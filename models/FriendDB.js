@@ -197,7 +197,7 @@ var dbRecommendFriend = function(uid, callback){
     var script3 = ", peopleWithSameAff AS ( " +
                   "SELECT R.id " +
                   "FROM USERS U, USERS R " +
-                  "WHERE U.id = 106 AND R.affiliation = U.affiliation " +
+                  "WHERE U.id = :1 AND R.affiliation = U.affiliation " +
                   "), peopleSameAffNonFriend AS (" +
                   "SELECT * " +
                   "FROM peopleWithSameAff PWSA " +
