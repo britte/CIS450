@@ -60,10 +60,15 @@ var dbGetFriendTrips = function(uid, callback) {
                  "INNER JOIN friends uf ON uf.friend_1 = u.id " +
                  "INNER JOIN users f ON f.id = uf.friend_2 " +
                  "WHERE (uf.status = 1 AND u.id =:1)) ";
-    var tripsYouWentOn = "WITH TYWO AS (SELECT pt.trip FROM PARTICIPATE_TRIP " +
-                         ""
-    var script2 = "SELECT t.ID FROM trips t" +
-                 "INNER JOIN fr ON fr.id = t.owner";
+    var tripsYouWentOn = "(SELECT pt.trip FROM PARTICIPATE_TRIP pt " +
+                         "INNER JOIN users u ON u.id = pt.invitee AND u.id = :1";
+    var script2 = "SELECT t.ID FROM trips t " +
+                 "INNER JOIN fr ON fr.id = t.owner " +
+                 "UNION " +
+                 "SELECT pt.trip FROM PARTICIPATE_TRIP pt " +
+                 "INNER JOIN fr ON fr.id = pt.invitee AND pt.status > 0" +
+                 "MINUS " +
+                 tripsYouWentOn;
     oracle.connect(connectData, function(err, connection){
         if (err) { console.log("Error connecting to db:" + err); }
         else {
